@@ -366,8 +366,27 @@ footer p {
     align-items: center;
     gap: 1rem;
     transition: transform 0.2s, background 0.3s, border-color 0.3s;
-    cursor: grab;
     user-select: none;
+}
+
+.drag-handle {
+    cursor: grab;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+}
+
+.drag-handle:hover {
+    opacity: 1;
+    color: var(--accent-color);
+}
+
+.drag-handle:active {
+    cursor: grabbing;
 }
 
 .job-card:active {
