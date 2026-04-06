@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Paneli | Jasmin Digital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .admin-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            width: 100%;
+        }
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 13px;
+            transition: all 0.3s ease;
+        }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        input[type="checkbox"]:checked + .toggle-switch {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+        input[type="checkbox"]:checked + .toggle-switch::after {
+            left: 26px;
+        }
+        .hidden-checkbox {
+            display: none;
+        }
+        .status-txt {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            transition: opacity 0.5s ease;
+        }
+        .link-card.updating {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading" class="loading-overlay">
+        <p>Yükleniyor...</p>
+    </div>
+
+    <div class="bg-glow glow-1"></div>
+    <div class="bg-glow glow-2"></div>
+    <div class="container">
+        <header>
+            <h1>Admin Paneli</h1>
+            <p>Yeni Post İşaretleme</p>
+        </header>
+
+        <main id="links-container" class="links-grid">
+            <!-- Dinamik olarak dolacak -->
+        </main>
+
+        <footer>
+            <p>&copy; Jasmin Digital | <a href="index.html" style="color: var(--accent-color); text-decoration: none;">Siteye Dön</a></p>
+        </footer>
+    </div>
+
+    <script src="supabase-config.js"></script>
+    <script>
+        async function fetchLinks() {
+            const { data, error } = await sb.from('posts').select('*').order('name');
+            if (error) {
+                console.error(error);
+                alert("Veriler çekilemedi!");
+                return;
+            }
+            renderLinks(data);
+            document.getElementById('loading').style.opacity = '0';
+            setTimeout(() => document.getElementById('loading').style.display = 'none', 500);
+        }
+
+        function renderLinks(links) {
+            const container = document.getElementById('links-container');
+            container.innerHTML = links.map(link => `
+                <div class="link-card" id="card-${link.id}">
+                    <img src="${link.image_url}" alt="${link.name}" class="profile-img">
+                    <div class="card-content">
+                        <span class="company-name">${link.name}</span>
+                        <div class="admin-controls">
+                             <label class="toggle-container" onclick="toggleNew('${link.id}', ${!link.has_new})">
+                                <input type="checkbox" class="hidden-checkbox" ${link.has_new ? 'checked' : ''}>
+                                <div class="toggle-switch"></div>
+                                <span class="status-txt">${link.has_new ? 'YENİ AKTİF' : 'NORMAL'}</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function toggleNew(id, status) {
+            const card = document.getElementById(`card-${id}`);
+            card.classList.add('updating');
+
+            const { error } = await sb.from('posts').update({ has_new: status }).eq('id', id);
+
+            if (error) {
+                alert("Güncelleme hatası!");
+                console.error(error);
+            } else {
+                // UI Güncelle
+                const label = card.querySelector('.status-txt');
+                const checkbox = card.querySelector('input');
+                checkbox.checked = status;
+                label.innerText = status ? 'YENİ AKTİF' : 'NORMAL';
+                // Toggle event logic
+                card.querySelector('.toggle-container').setAttribute('onclick', `toggleNew('${id}', ${!status})`);
+            }
+            card.classList.remove('updating');
+        }
+
+        fetchLinks();
+    </script>
+</body>
+</html>

@@ -110,6 +110,11 @@ header p {
     box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.5);
 }
 
+.link-card {
+    position: relative;
+    overflow: hidden; /* Required for the ribbon badge */
+}
+
 .profile-img {
     width: 48px;
     height: 48px;
@@ -161,6 +166,49 @@ header p {
 .drive-btn svg {
     width: 16px;
     height: 16px;
+}
+
+/* Diagonal Ribbon Badge - Better Readability */
+.badge {
+    position: absolute;
+    top: 15px;
+    right: -30px;
+    width: 130px;
+    background: linear-gradient(135deg, #ff0055 0%, #ff4d00 100%);
+    color: white;
+    font-size: 0.72rem;
+    font-weight: 900;
+    padding: 0.35rem 0;
+    text-align: center;
+    transform: rotate(45deg);
+    box-shadow: 0 4px 10px rgba(255, 0, 85, 0.3);
+    z-index: 10;
+    border: none;
+    letter-spacing: 0.05em;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    animation: ribbon-glow 2s infinite ease-in-out;
+}
+
+@keyframes ribbon-glow {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.2) saturate(1.2); }
+}
+
+.link-card {
+    position: relative; /* For absolute badge */
+}
+
+.skeleton {
+    background: linear-gradient(90deg, var(--glass-bg) 25%, rgba(139, 92, 246, 0.1) 50%, var(--glass-bg) 75%);
+    background-size: 200% 100%;
+    animation: loading-shimmer 1.5s infinite;
+    height: 80px;
+    border-radius: 1.5rem;
+}
+
+@keyframes loading-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
 }
 
 footer {
