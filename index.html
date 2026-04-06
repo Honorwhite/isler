@@ -23,68 +23,123 @@
             <p>Drive Dosyalarına Hızlı Erişim</p>
         </header>
 
+        <!-- Dynamic Content -->
         <main class="links-grid" id="links-container">
-            <!-- Skeletons while loading -->
-            <div class="skeleton"></div>
             <div class="skeleton"></div>
             <div class="skeleton"></div>
         </main>
 
         <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
         <script src="supabase-config.js"></script>
         <script>
-            async function loadLinks() {
+            async function loadData() {
+                const today = new Date().toISOString().split('T')[0];
+                
+                // Fetch both posts and today's statuses
+                const [{ data: posts, error: pErr }, { data: statuses, error: sErr }] = await Promise.all([
+                    sb.from('posts').select('*').order('has_new', { ascending: false }).order('created_at', { ascending: false }),
+                    sb.from('post_daily_status').select('*').eq('date', today)
+                ]);
+
+                if (pErr) console.error(pErr);
+                
+                renderCards(posts, statuses || []);
+            }
+
+            function renderCards(posts, statuses) {
                 const container = document.getElementById('links-container');
-                const { data, error } = await sb.from('posts').select('*').order('has_new', { ascending: false }).order('created_at', { ascending: false });
+                const statusMap = Object.fromEntries(statuses.map(s => [s.post_id, s.is_done]));
+                
+                const months = ["OCA", "SUB", "MAR", "NIS", "MAY", "HAZ", "TEM", "AGU", "EYL", "EKİ", "KAS", "ARA"];
+                const now = new Date();
+                const currentDay = String(now.getDate()).padStart(2, '0');
+                const currentMonth = months[now.getMonth()];
+
+                container.innerHTML = posts.map(post => {
+                    const isDone = statusMap[post.id] === true;
+                    return `
+                        <div class="link-row-wrapper">
+                            <a href="${post.link}" class="link-card ${isDone ? 'done' : ''}" id="card-${post.id}" target="_blank">
+                                ${post.has_new ? '<span class="badge">YENİ POST</span>' : ''}
+                                <img src="${post.image_url}" alt="${post.name}" class="profile-img">
+                                <div class="card-content">
+                                    <span class="company-name">${post.name}</span>
+                                </div>
+                                <div class="drive-btn" title="Drive'ı Aç">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                                        <polyline points="15 3 21 3 21 9" />
+                                        <line x1="10" y1="14" x2="21" y2="3" />
+                                    </svg>
+                                </div>
+                            </a>
+
+                            <!-- Dışarıdaki Günlük Takip Widgetı -->
+                            <div class="card-tracker-box ${isDone ? 'done' : ''}" 
+                                    onclick="toggleCardDaily(event, '${post.id}', ${isDone})">
+                                <div class="mini-calendar">
+                                    <span class="m">${currentMonth}</span>
+                                    <span class="d">${currentDay}</span>
+                                </div>
+                                <div class="tracker-label">
+                                    <span class="label-bottom">${isDone ? 'POST PAYLAŞILDI' : 'POST PAYLAŞILMADI'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            async function toggleCardDaily(event, postId, currentStatus) {
+                const today = new Date().toISOString().split('T')[0];
+                const newStatus = !currentStatus;
+
+                // Konfeti Efekti (Daha Minimal)
+                if (newStatus) {
+                    const rect = event.currentTarget.getBoundingClientRect();
+                    confetti({
+                        particleCount: 35,
+                        spread: 40,
+                        origin: { 
+                            x: (rect.left + rect.width / 2) / window.innerWidth,
+                            y: (rect.top + rect.height / 2) / window.innerHeight 
+                        },
+                        colors: ['#10b981', '#ffffff'],
+                        scalar: 0.7, // Parçaları küçülttük
+                    });
+                }
+
+                const { error } = await sb.from('post_daily_status').upsert({
+                    post_id: postId,
+                    date: today,
+                    is_done: newStatus
+                }, { onConflict: 'post_id,date' });
 
                 if (error) {
                     console.error(error);
-                    container.innerHTML = '<p style="text-align:center; color: var(--text-secondary);">Veriler yüklenirken bir hata oluştu.</p>';
-                    return;
+                    alert("Hata oluştu!");
                 }
-                renderLinks(data);
-            }
-
-            function renderLinks(data) {
-                const container = document.getElementById('links-container');
-                if (data.length === 0) {
-                    container.innerHTML = '<p style="text-align:center; color: var(--text-secondary);">Henüz içerik eklenmemiş.</p>';
-                    return;
-                }
-
-                container.innerHTML = data.map(post => `
-                    <a href="${post.link}" class="link-card" target="_blank">
-                        ${post.has_new ? '<span class="badge">YENİ POST</span>' : ''}
-                        <img src="${post.image_url}" alt="${post.name}" class="profile-img">
-                        <div class="card-content">
-                            <span class="company-name">${post.name}</span>
-                        </div>
-                        <div class="drive-btn">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M15 3h6v6" />
-                                <path d="M10 14 21 3" />
-                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                            </svg>
-                            Aç
-                        </div>
-                    </a>
-                `).join('');
+                loadData();
             }
 
             // Realtime Dinleyici
-            const channels = sb.channel('custom-all-channel')
+            sb.channel('all-changes')
             .on(
                 'postgres_changes',
                 { event: '*', schema: 'public', table: 'posts' },
-                (payload) => {
-                    console.log('Değişiklik algılandı!', payload);
-                    loadLinks(); // Bir değişiklik olduğunda verileri tekrar çek
-                }
+                () => loadData()
             )
-            .subscribe()
+            .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'post_daily_status' },
+                () => loadData()
+            )
+            .subscribe();
 
-            loadLinks();
+            loadData();
+        </script>
         </script>
 
         <footer>
