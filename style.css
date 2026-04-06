@@ -48,7 +48,7 @@ body {
 }
 
 .container {
-    max-width: 800px;
+    max-width: 600px;
     margin: 0 auto;
     padding: 3rem 1.25rem;
     min-height: 100vh;
@@ -59,98 +59,7 @@ body {
 
 header {
     text-align: center;
-    margin-bottom: 2.5rem;
-}
-
-/* Daily Tracker Widget Styles */
-.daily-tracker-card {
-    background: var(--glass-bg);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--glass-border);
-    border-radius: 1.5rem;
-    padding: 1.25rem;
-    margin-bottom: 2.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    position: relative;
-    overflow: hidden;
-}
-
-.calendar-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--glass-border);
-    border-radius: 1rem;
-    min-width: 70px;
-    height: 70px;
-    text-align: center;
-}
-
-.calendar-box .month {
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: var(--accent-color);
-    letter-spacing: 0.1em;
-}
-
-.calendar-box .day {
-    font-family: 'Outfit', sans-serif;
-    font-size: 1.5rem;
-    font-weight: 800;
-    line-height: 1;
-}
-
-.tracker-info {
-    flex-grow: 1;
-}
-
-.tracker-title {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 0.2rem;
-}
-
-.tracker-status {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-}
-
-.tracker-toggle {
-    cursor: pointer;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid var(--glass-border);
-    padding: 0.6rem;
-    border-radius: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-}
-
-.tracker-toggle:hover {
-    background: rgba(168, 85, 247, 0.15);
-    border-color: var(--accent-color);
-    transform: scale(1.05);
-}
-
-.tracker-toggle.done {
-    background: var(--accent-color);
-    border-color: var(--accent-color);
-    box-shadow: 0 4px 15px var(--accent-glow);
-}
-
-.tracker-toggle svg {
-    width: 24px;
-    height: 24px;
-    color: white;
+    margin-bottom: 3.5rem;
 }
 
 h1 {
@@ -189,25 +98,9 @@ header p {
     align-items: center;
     gap: 1rem;
     text-decoration: none;
+    /* Entire card is clickable */
     color: inherit;
     transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-    flex-grow: 1; /* Wrapper içinde büyümesi için */
-    position: relative;
-    overflow: hidden;
-}
-
-.link-row-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 1.25rem;
-    width: 100%;
-}
-
-.link-card.done {
-    opacity: 0.45; /* Daha sönük dursun */
-    filter: grayscale(1); /* Komple gri olsun */
-    pointer-events: auto; /* Hala tıklanabilir kalsın (link lazım olabilir) */
-    transform: scale(0.98); /* Hafif küçülsün ki geride kalsın */
 }
 
 .link-card:hover {
@@ -219,7 +112,8 @@ header p {
 
 .link-card {
     position: relative;
-    overflow: hidden; /* Required for the ribbon badge */
+    overflow: hidden;
+    /* Required for the ribbon badge */
 }
 
 .profile-img {
@@ -275,90 +169,6 @@ header p {
     height: 16px;
 }
 
-/* Gelişmiş Dış Takipçi Tasarımı */
-.card-tracker-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--glass-border);
-    padding: 0.75rem;
-    border-radius: 1.25rem;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    min-width: 90px;
-    height: 100%;
-    user-select: none;
-    text-align: center;
-    gap: 0.4rem;
-}
-
-.mini-calendar {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--glass-border);
-    border-radius: 0.5rem;
-    min-width: 38px;
-    height: 38px;
-    line-height: 1.1;
-}
-
-.mini-calendar .m {
-    font-size: 0.5rem;
-    font-weight: 800;
-    color: var(--text-secondary);
-}
-
-.mini-calendar .d {
-    font-size: 0.9rem;
-    font-weight: 800;
-    color: white;
-}
-
-.tracker-label {
-    display: flex;
-    flex-direction: column;
-}
-
-.label-top {
-    font-size: 0.7rem;
-    font-weight: 800;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.label-bottom {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #ef4444; /* Bekliyor: Kırmızı */
-}
-
-/* Onaylandığında (Done) Durumu */
-.card-tracker-box.done {
-    background: rgba(16, 185, 129, 0.15);
-    border-color: #10b981;
-    box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
-}
-
-.card-tracker-box.done .mini-calendar {
-    border-color: #10b981;
-    background: #10b981;
-}
-
-.card-tracker-box.done .label-bottom {
-    color: #10b981; /* Atıldı: Yeşil */
-}
-
-.card-tracker-box:hover {
-    transform: translateY(-2px);
-    background: rgba(255, 255, 255, 0.08);
-}
-
 /* Diagonal Ribbon Badge - Better Readability */
 .badge {
     position: absolute;
@@ -376,17 +186,25 @@ header p {
     z-index: 10;
     border: none;
     letter-spacing: 0.05em;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
     animation: ribbon-glow 2s infinite ease-in-out;
 }
 
 @keyframes ribbon-glow {
-    0%, 100% { filter: brightness(1); }
-    50% { filter: brightness(1.2) saturate(1.2); }
+
+    0%,
+    100% {
+        filter: brightness(1);
+    }
+
+    50% {
+        filter: brightness(1.2) saturate(1.2);
+    }
 }
 
 .link-card {
-    position: relative; /* For absolute badge */
+    position: relative;
+    /* For absolute badge */
 }
 
 .skeleton {
@@ -398,8 +216,13 @@ header p {
 }
 
 @keyframes loading-shimmer {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
 }
 
 footer {
@@ -413,69 +236,6 @@ footer p {
     color: var(--text-secondary);
     font-size: 0.9rem;
     opacity: 0.6;
-}
-
-@media (max-width: 600px) {
-    .container {
-        padding: 2rem 0.5rem;
-    }
-
-    .link-row-wrapper {
-        flex-direction: row;
-        gap: 0.4rem; /* Daha sıkı bir görüntü */
-        align-items: stretch;
-    }
-
-    /* Takipçi Kutusu Mobilde Yazıyla Beraber */
-    .card-tracker-box {
-        min-width: 75px; /* Yazı sığacak kadar genişlik */
-        padding: 0.4rem;
-        gap: 0.2rem;
-        border-radius: 1rem;
-    }
-
-    .tracker-label {
-        display: flex; /* Yazıyı geri getirdik */
-    }
-
-    .mini-calendar {
-        min-width: 32px;
-        height: 32px;
-        border-radius: 0.4rem;
-    }
-
-    .mini-calendar .m { font-size: 0.4rem; }
-    .mini-calendar .d { font-size: 0.8rem; }
-
-    .label-bottom {
-        font-size: 0.5rem; /* Yazıyı küçük tuttuk ki sığsın */
-        line-height: 1.1;
-    }
-
-    .link-card {
-        padding: 0.6rem 0.75rem;
-        border-radius: 1rem;
-    }
-
-    .profile-img {
-        width: 34px;
-        height: 34px;
-        border-radius: 8px;
-    }
-
-    .company-name {
-        font-size: 0.82rem;
-    }
-
-    .drive-btn {
-        padding: 0.35rem;
-        border-radius: 0.6rem;
-    }
-
-    .drive-btn svg {
-        width: 14px;
-        height: 14px;
-    }
 }
 
 @media (max-width: 480px) {
@@ -501,4 +261,188 @@ footer p {
         padding: 0.5rem 1rem;
         font-size: 0.8125rem;
     }
+}
+
+/* Tabs Navigation */
+.tabs-nav {
+    display: flex;
+    gap: 0.5rem;
+    background: var(--glass-bg);
+    padding: 0.4rem;
+    border-radius: 1rem;
+    border: 1px solid var(--glass-border);
+    margin: 0 auto 2.5rem auto;
+    width: fit-content;
+}
+
+.tab-btn {
+    padding: 0.6rem 1.5rem;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.tab-btn.active {
+    background: var(--accent-color);
+    color: white;
+    box-shadow: 0 4px 12px -2px var(--accent-glow);
+}
+
+/* Job Tracking Section */
+.tab-content {
+    display: none;
+    animation: fadeIn 0.4s easeOut;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Admin Form */
+.admin-form {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    padding: 0.75rem;
+    border-radius: 1.25rem;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: row;
+    gap: 0.75rem;
+}
+
+.admin-form input {
+    flex-grow: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: white;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.admin-form input:focus {
+    border-color: var(--accent-color);
+}
+
+.admin-form button {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+    white-space: nowrap;
+}
+
+.admin-form button:hover {
+    opacity: 0.9;
+    transform: scale(0.98);
+}
+
+/* Job Cards */
+.job-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 1rem;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.2s, background 0.3s, border-color 0.3s;
+    cursor: grab;
+    user-select: none;
+}
+
+.job-card:active {
+    cursor: grabbing;
+}
+
+/* SortableJS Styles */
+.sortable-ghost {
+    opacity: 0.2;
+    background: var(--accent-color) !important;
+    border: 2px dashed var(--accent-color) !important;
+}
+
+.sortable-chosen {
+    background: var(--card-hover-bg) !important;
+    border-color: var(--accent-color) !important;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+.sortable-drag {
+    opacity: 1 !important;
+    transform: scale(1.05) rotate(2deg);
+    cursor: grabbing;
+    background: var(--accent-color) !important;
+    z-index: 1000;
+}
+
+.job-card.completed {
+    opacity: 0.6;
+}
+
+.job-card.completed .job-title {
+    text-decoration: line-through;
+    color: var(--text-secondary);
+}
+
+.job-info {
+    flex-grow: 1;
+}
+
+.job-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: block;
+}
+
+.job-notes {
+    display: none;
+}
+
+.job-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-complete, .btn-delete {
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-secondary);
+    border: 1px solid var(--glass-border);
+    padding: 0.5rem;
+    border-radius: 0.6rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-complete:hover, .btn-delete:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+.btn-complete:active, .btn-delete:active {
+    transform: scale(0.95);
 }

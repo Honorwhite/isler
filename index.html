@@ -12,6 +12,7 @@
         href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Outfit:wght@100..900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 </head>
 
 <body>
@@ -20,126 +21,210 @@
     <div class="container">
         <header>
             <h1>Çalışmalar</h1>
-            <p>Drive Dosyalarına Hızlı Erişim</p>
+            <p>Drive Dosyaları & İş Takibi</p>
         </header>
 
-        <!-- Dynamic Content -->
-        <main class="links-grid" id="links-container">
-            <div class="skeleton"></div>
-            <div class="skeleton"></div>
-        </main>
+        <div class="tabs-nav">
+            <button class="tab-btn active" id="btn-posts" onclick="switchTab('posts')">Günlük Postlar</button>
+            <button class="tab-btn" id="btn-jobs" onclick="switchTab('jobs')">Eldeki İşler</button>
+        </div>
+
+        <!-- Post Tab -->
+        <div id="tab-posts" class="tab-content active">
+            <main class="links-grid" id="links-container">
+                <!-- Skeletons while loading -->
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
+            </main>
+        </div>
+
+        <!-- Job Tab -->
+        <div id="tab-jobs" class="tab-content">
+            <form class="admin-form" onsubmit="event.preventDefault(); addJob();">
+                <input type="text" id="job-title" placeholder="Yeni iş adını yaz...">
+                <button type="submit">Ekle</button>
+            </form>
+
+            <div id="jobs-container">
+                <!-- Dinamik olarak dolacak -->
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
+            </div>
+        </div>
 
         <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-        <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
         <script src="supabase-config.js"></script>
         <script>
-            async function loadData() {
-                const today = new Date().toISOString().split('T')[0];
-                
-                // Fetch both posts and today's statuses
-                const [{ data: posts, error: pErr }, { data: statuses, error: sErr }] = await Promise.all([
-                    sb.from('posts').select('*').order('has_new', { ascending: false }).order('created_at', { ascending: false }),
-                    sb.from('post_daily_status').select('*').eq('date', today)
-                ]);
+            // Tab Switching
+            function switchTab(tabName) {
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
-                if (pErr) console.error(pErr);
-                
-                renderCards(posts, statuses || []);
-            }
-
-            function renderCards(posts, statuses) {
-                const container = document.getElementById('links-container');
-                const statusMap = Object.fromEntries(statuses.map(s => [s.post_id, s.is_done]));
-                
-                const months = ["OCA", "SUB", "MAR", "NIS", "MAY", "HAZ", "TEM", "AGU", "EYL", "EKİ", "KAS", "ARA"];
-                const now = new Date();
-                const currentDay = String(now.getDate()).padStart(2, '0');
-                const currentMonth = months[now.getMonth()];
-
-                container.innerHTML = posts.map(post => {
-                    const isDone = statusMap[post.id] === true;
-                    return `
-                        <div class="link-row-wrapper">
-                            <a href="${post.link}" class="link-card ${isDone ? 'done' : ''}" id="card-${post.id}" target="_blank">
-                                ${post.has_new ? '<span class="badge">YENİ POST</span>' : ''}
-                                <img src="${post.image_url}" alt="${post.name}" class="profile-img">
-                                <div class="card-content">
-                                    <span class="company-name">${post.name}</span>
-                                </div>
-                                <div class="drive-btn" title="Drive'ı Aç">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                                        <polyline points="15 3 21 3 21 9" />
-                                        <line x1="10" y1="14" x2="21" y2="3" />
-                                    </svg>
-                                </div>
-                            </a>
-
-                            <!-- Dışarıdaki Günlük Takip Widgetı -->
-                            <div class="card-tracker-box ${isDone ? 'done' : ''}" 
-                                    onclick="toggleCardDaily(event, '${post.id}', ${isDone})">
-                                <div class="mini-calendar">
-                                    <span class="m">${currentMonth}</span>
-                                    <span class="d">${currentDay}</span>
-                                </div>
-                                <div class="tracker-label">
-                                    <span class="label-bottom">${isDone ? 'POST PAYLAŞILDI' : 'POST PAYLAŞILMADI'}</span>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            }
-
-            async function toggleCardDaily(event, postId, currentStatus) {
-                const today = new Date().toISOString().split('T')[0];
-                const newStatus = !currentStatus;
-
-                // Konfeti Efekti (Daha Minimal)
-                if (newStatus) {
-                    const rect = event.currentTarget.getBoundingClientRect();
-                    confetti({
-                        particleCount: 35,
-                        spread: 40,
-                        origin: { 
-                            x: (rect.left + rect.width / 2) / window.innerWidth,
-                            y: (rect.top + rect.height / 2) / window.innerHeight 
-                        },
-                        colors: ['#10b981', '#ffffff'],
-                        scalar: 0.7, // Parçaları küçülttük
-                    });
+                if (tabName === 'posts') {
+                    document.getElementById('btn-posts').classList.add('active');
+                    document.getElementById('tab-posts').classList.add('active');
+                    loadLinks();
+                } else {
+                    document.getElementById('btn-jobs').classList.add('active');
+                    document.getElementById('tab-jobs').classList.add('active');
+                    loadJobs();
                 }
+            }
 
-                const { error } = await sb.from('post_daily_status').upsert({
-                    post_id: postId,
-                    date: today,
-                    is_done: newStatus
-                }, { onConflict: 'post_id,date' });
+            async function loadLinks() {
+                const container = document.getElementById('links-container');
+                const { data, error } = await sb.from('posts').select('*').order('has_new', { ascending: false }).order('created_at', { ascending: false });
 
                 if (error) {
                     console.error(error);
-                    alert("Hata oluştu!");
+                    container.innerHTML = '<p style="text-align:center; color: var(--text-secondary);">Veriler yüklenirken bir hata oluştu.</p>';
+                    return;
                 }
-                loadData();
+                renderLinks(data);
+            }
+
+            function renderLinks(data) {
+                const container = document.getElementById('links-container');
+                if (data.length === 0) {
+                    container.innerHTML = '<p style="text-align:center; color: var(--text-secondary);">Henüz içerik eklenmemiş.</p>';
+                    return;
+                }
+
+                container.innerHTML = data.map(post => `
+                    <a href="${post.link}" class="link-card" target="_blank">
+                        ${post.has_new ? '<span class="badge">YENİ POST</span>' : ''}
+                        <img src="${post.image_url}" alt="${post.name}" class="profile-img">
+                        <div class="card-content">
+                            <span class="company-name">${post.name}</span>
+                        </div>
+                        <div class="drive-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M15 3h6v6" />
+                                <path d="M10 14 21 3" />
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                            </svg>
+                            Aç
+                        </div>
+                    </a>
+                `).join('');
+            }
+
+            // Job Loading
+            async function loadJobs() {
+                const { data, error } = await sb.from('jobs').select('*');
+
+                if (error) {
+                    console.error(error);
+                    document.getElementById('jobs-container').innerHTML = '<p style="text-align:center; color: var(--text-secondary);">İşler yüklenirken bir hata oluştu.</p>';
+                    return;
+                }
+
+                // Custom Sort: Active (pos) -> Completed (latest updated_at)
+                const sortedData = data.sort((a, b) => {
+                    if (a.is_completed !== b.is_completed) {
+                        return a.is_completed ? 1 : -1;
+                    }
+                    if (!a.is_completed) {
+                        return (a.position || 0) - (b.position || 0);
+                    }
+                    return new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at);
+                });
+
+                renderJobs(sortedData);
+                initSortable();
+            }
+
+            let sortable;
+            function initSortable() {
+                const el = document.getElementById('jobs-container');
+                if (sortable) sortable.destroy();
+                
+                sortable = new Sortable(el, {
+                    animation: 200,
+                    ghostClass: 'sortable-ghost',
+                    chosenClass: 'sortable-chosen',
+                    dragClass: 'sortable-drag',
+                    forceFallback: false,
+                    onEnd: async function() {
+                        const items = el.querySelectorAll('.job-card');
+                        const updates = Array.from(items).map((item, index) => ({
+                            id: item.dataset.id,
+                            position: index
+                        }));
+
+                        // Paralel güncelleme ve tek seferlik fetch
+                        await Promise.all(updates.map(u => 
+                            sb.from('jobs').update({ position: u.position }).eq('id', u.id)
+                        ));
+                        
+                        loadJobs();
+                    }
+                });
+            }
+
+            async function addJob() {
+                const title = document.getElementById('job-title').value;
+                if (!title) return;
+
+                const { error } = await sb.from('jobs').insert([{ title, is_completed: false }]);
+                if (error) alert("Hata!");
+                else {
+                    document.getElementById('job-title').value = '';
+                    loadJobs();
+                }
+            }
+
+            function renderJobs(jobs) {
+                const container = document.getElementById('jobs-container');
+                if (jobs.length === 0) {
+                    container.innerHTML = '<p style="text-align:center; color: var(--text-secondary);">Şu an eldeki iş yok.</p>';
+                    return;
+                }
+
+                container.innerHTML = jobs.map(job => `
+                    <div class="job-card ${job.is_completed ? 'completed' : ''}" data-id="${job.id}">
+                        <div class="job-info">
+                            <span class="job-title">${job.title}</span>
+                        </div>
+                        <div class="job-actions">
+                            <button class="btn-complete" title="Tamamlandı" onclick="toggleJob('${job.id}', ${!job.is_completed})">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </button>
+                            <button class="btn-delete" title="Sil" onclick="deleteJob('${job.id}')">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            async function toggleJob(id, status) {
+                const { error } = await sb.from('jobs').update({ 
+                    is_completed: status,
+                    updated_at: new Date().toISOString() 
+                }).eq('id', id);
+                if (error) alert("Güncelleme hatası!");
+                else loadJobs();
+            }
+
+            async function deleteJob(id) {
+                if (!confirm('Bu işi silmek istediğinize emin misiniz?')) return;
+                const { error } = await sb.from('jobs').delete().eq('id', id);
+                if (error) alert("Silme hatası!");
+                else loadJobs();
             }
 
             // Realtime Dinleyici
-            sb.channel('all-changes')
-            .on(
-                'postgres_changes',
-                { event: '*', schema: 'public', table: 'posts' },
-                () => loadData()
-            )
-            .on(
-                'postgres_changes',
-                { event: '*', schema: 'public', table: 'post_daily_status' },
-                () => loadData()
-            )
-            .subscribe();
+            sb.channel('custom-all-channel')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, loadLinks)
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'jobs' }, () => {
+                    if (document.getElementById('tab-jobs').classList.contains('active')) loadJobs();
+                })
+                .subscribe();
 
-            loadData();
-        </script>
+            loadLinks();
         </script>
 
         <footer>
@@ -148,4 +233,4 @@
     </div>
 </body>
 
-</html>
+</html>
