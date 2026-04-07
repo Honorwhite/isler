@@ -13,6 +13,12 @@
         rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Jasmin Digital" />
+    <link rel="manifest" href="/site.webmanifest" />
 </head>
 
 <body>
@@ -140,7 +146,7 @@
             function initSortable() {
                 const el = document.getElementById('jobs-container');
                 if (sortable) sortable.destroy();
-                
+
                 sortable = new Sortable(el, {
                     animation: 200,
                     ghostClass: 'sortable-ghost',
@@ -148,7 +154,7 @@
                     dragClass: 'sortable-drag',
                     handle: '.drag-handle', // Sadece ikonla taşınsın
                     forceFallback: false,
-                    onEnd: async function() {
+                    onEnd: async function () {
                         const items = el.querySelectorAll('.job-card');
                         const updates = Array.from(items).map((item, index) => ({
                             id: item.dataset.id,
@@ -156,10 +162,10 @@
                         }));
 
                         // Paralel güncelleme ve tek seferlik fetch
-                        await Promise.all(updates.map(u => 
+                        await Promise.all(updates.map(u =>
                             sb.from('jobs').update({ position: u.position }).eq('id', u.id)
                         ));
-                        
+
                         loadJobs();
                     }
                 });
@@ -205,9 +211,9 @@
             }
 
             async function toggleJob(id, status) {
-                const { error } = await sb.from('jobs').update({ 
+                const { error } = await sb.from('jobs').update({
                     is_completed: status,
-                    updated_at: new Date().toISOString() 
+                    updated_at: new Date().toISOString()
                 }).eq('id', id);
                 if (error) alert("Güncelleme hatası!");
                 else loadJobs();
@@ -237,4 +243,4 @@
     </div>
 </body>
 
-</html>
+</html>
