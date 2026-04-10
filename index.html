@@ -12,6 +12,7 @@
         href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Outfit:wght@100..900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -31,283 +32,177 @@
             <p>Drive Dosyaları & İş Takibi</p>
         </header>
 
-        <main class="links-grid">
-            <!-- Item 1 -->
-            <a href="https://drive.google.com/open?id=11MIvcvorTqjcuSMwtK6X6a--rTatQO6H&usp=drive_fs" class="link-card"
-                target="_blank">
-                <img src="assets/peri.jpg" alt="Perihan Göçer Ünal" class="profile-img">
-                <div class="card-content">
-                    <span class="company-name">Perihan Göçer Ünal</span>
-                </div>
-                <div class="drive-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M15 3h6v6" />
-                        <path d="M10 14 21 3" />
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                    </svg>
-                    Aç
-                </div>
-            </a>
-            <!-- Item 1 -->
-            <a href="https://drive.google.com/open?id=1xM27aJR5uOeFfYWTOEvNPKygK73vzszS&usp=drive_fs" class="link-card"
-                target="_blank">
-                <img src="assets/yulia.jpg" alt="Yulia Özcömert" class="profile-img">
-                <div class="card-content">
-                    <span class="company-name">Yulia Özcömert</span>
-                </div>
-                <div class="drive-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M15 3h6v6" />
-                        <path d="M10 14 21 3" />
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                    </svg>
-                    Aç
-                </div>
-            </a>
-            <!-- Item 2 -->
-            <a href="https://drive.google.com/open?id=1Jz778YoP31j8AtKfpLB3mVz5eh3oDwU2&usp=drive_fs" class="link-card"
-                target="_blank">
-                <img src="assets/yagmur.jpg" alt="Yağmur Yaprak Balı" class="profile-img">
-                <div class="card-content">
-                    <span class="company-name">Yağmur Yaprak Balı</span>
-                </div>
-                <div class="drive-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M15 3h6v6" />
-                        <path d="M10 14 21 3" />
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                    </svg>
-                    Aç
-                </div>
-            </a>
-            <!-- Item 2 -->
-            <a href="https://drive.google.com/open?id=17TvcS1APDSLs2UHU1UT2IvGocT5Cg-51&usp=drive_fs" class="link-card"
-                target="_blank">
-                <img src="assets/baris.jpg" alt="Barış Kıray" class="profile-img">
-                <div class="card-content">
-                    <span class="company-name">Barış Kıray</span>
-                </div>
-                <div class="drive-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M15 3h6v6" />
-                        <path d="M10 14 21 3" />
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                    </svg>
-                    Aç
-                </div>
-            </a>
-            <!-- Item 3 -->
-            <a href="https://drive.google.com/open?id=16sDB1gQ6P1a8eHu2hZnsml3j6bG8_2Yl&usp=drive_fs" class="link-card"
-                target="_blank">
-                <img src="assets/hulya.jpg" alt="Hülya Yetiş Sucu" class="profile-img">
-                <div class="card-content">
-                    <span class="company-name">Hülya Yetiş Sucu</span>
-                </div>
-                <div class="drive-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M15 3h6v6" />
-                        <path d="M10 14 21 3" />
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                    </svg>
-                    Aç
-                </div>
-            </a>
-            <!-- Item 4 -->
-            <a href="https://drive.google.com/open?id=1HsP-i3GfKepT6rlxRDmBA79DwyXJIk2E&usp=drive_fs" class="link-card"
-                target="_blank">
-                <img src="assets/ersin.jpg" alt="Ersin Fidan" class="profile-img">
-                <div class="card-content">
-                    <span class="company-name">Ersin Fidan</span>
-                </div>
-                <div class="drive-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M15 3h6v6" />
-                        <path d="M10 14 21 3" />
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                    </svg>
-                    Aç
-                </div>
-            </a>
-            <!-- Item 5 -->
-            <a href="https://drive.google.com/open?id=1XGTdfQhV_ln-gDGGz54aNIuEKvnb9CaJ&usp=drive_fs" class="link-card"
-                target="_blank">
-                <img src="assets/hakancicek.jpg" alt="Hakan Çiçek" class="profile-img">
-                <div class="card-content">
-                    <span class="company-name">Hakan Çiçek</span>
-                </div>
-                <div class="drive-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M15 3h6v6" />
-                        <path d="M10 14 21 3" />
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                    </svg>
-                    Aç
-                </div>
-            </a>
-            <!-- Item 6  -->
-            <a href="https://drive.google.com/open?id=1avLujD2GxEN0dNB3EvyUvhj4mrLmuXzA&usp=drive_fs" class="link-card"
-                target="_blank">
-                <img src="assets/gaps.jpg" alt="Gaps Adana" class="profile-img">
-                <div class="card-content">
-                    <span class="company-name">Gaps Adana</span>
-                </div>
-                <div class="drive-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M15 3h6v6" />
-                        <path d="M10 14 21 3" />
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                    </svg>
-                    Aç
-                </div>
-            </a>
-            <!-- Item 7
-            <a href="https://drive.google.com/open?id=1sxOHBlDDVjnfdQwKTy3BErggeRwoNSRJ&usp=drive_fs" class="link-card"
-                target="_blank">
-                <img src="assets/ilkay.jpg" alt="İlkay Yeter" class="profile-img">
-                <div class="card-content">
-                    <span class="company-name">İlkay Yeter</span>
-                </div>
-                <div class="drive-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M15 3h6v6" />
-                        <path d="M10 14 21 3" />
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                    </svg>
-                    Aç
-                </div>
-            </a>-->
-            <!-- Item 8 -->
-            <a href="https://drive.google.com/open?id=18qSiTBWTnJs-WdvF7XyqmbHcwnUG7aJs&usp=drive_fs" class="link-card"
-                target="_blank">
-                <img src="assets/umit.jpg" alt="Ümit Tuhanioglu" class="profile-img">
-                <div class="card-content">
-                    <span class="company-name">Ümit Tuhanioglu</span>
-                </div>
-                <div class="drive-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M15 3h6v6" />
-                        <path d="M10 14 21 3" />
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                    </svg>
-                    Aç
-                </div>
-            </a>
-            <!-- Item 8 
-            <a href="https://drive.google.com/open?id=1xRx27NuawHs1HT4vbjRn6Ak6l-3J76m-&usp=drive_fs" class="link-card"
-                target="_blank">
-                <img src="assets/birgul.jpg" alt="Birgül Tuhanioglu" class="profile-img">
-                <div class="card-content">
-                    <span class="company-name">Birgül Tuhanioglu</span>
-                </div>
-                <div class="drive-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M15 3h6v6" />
-                        <path d="M10 14 21 3" />
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                    </svg>
-                    Aç
-                </div>
-            </a>-->
-            <!-- Item 9 -->
-            <a href="https://drive.google.com/open?id=1k2BQduABTRVf-UcbVL734fcOpqUEE7qf&usp=drive_fs" class="link-card"
-                target="_blank">
-                <img src="assets/cagri.jpg" alt="Çağrı Yapar" class="profile-img">
-                <div class="card-content">
-                    <span class="company-name">Çağrı Yapar</span>
-                </div>
-                <div class="drive-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M15 3h6v6" />
-                        <path d="M10 14 21 3" />
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                    </svg>
-                    Aç
-                </div>
-            </a>
-            <!-- Item 9 
-            <a href="https://drive.google.com/open?id=1nSGgN4yeOFNJ0BVzHK6v_PgjE-ds-NX_&usp=drive_fs" class="link-card"
-                target="_blank">
-                <img src="assets/kavram.jpg" alt="Kavram" class="profile-img">
-                <div class="card-content">
-                    <span class="company-name">Kavram</span>
-                </div>
-                <div class="drive-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M15 3h6v6" />
-                        <path d="M10 14 21 3" />
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                    </svg>
-                    Aç
-                </div>
-            </a>-->
-            <!-- Item 9 -->
-            <a href="https://drive.google.com/open?id=1y2NhP_qPvuOWkwy5ABFMqtvLdtKM_k35&usp=drive_fs" class="link-card"
-                target="_blank">
-                <img src="assets/esthe.jpg" alt="Esthelabs" class="profile-img">
-                <div class="card-content">
-                    <span class="company-name">Esthelabs</span>
-                </div>
-                <div class="drive-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M15 3h6v6" />
-                        <path d="M10 14 21 3" />
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                    </svg>
-                    Aç
-                </div>
-            </a>
-            <a href="https://drive.google.com/open?id=1ujCe2a_hECzI16NxspNgA1jSl1EZkbUO&usp=drive_fs" class="link-card"
-                target="_blank">
-                <img src="assets/sibel.jpg" alt="Sibel Atağ" class="profile-img">
-                <div class="card-content">
-                    <span class="company-name">Sibel Atağ</span>
-                </div>
-                <div class="drive-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M15 3h6v6" />
-                        <path d="M10 14 21 3" />
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                    </svg>
-                    Aç
-                </div>
-            </a>
-            <a href="https://drive.google.com/open?id=16yFui_bOYwg8PHRxWJcYZU04f5TzcGCF&usp=drive_fs" class="link-card"
-                target="_blank">
-                <img src="assets/ebru.jpg" alt="Ebru Özkurt Topçu" class="profile-img">
-                <div class="card-content">
-                    <span class="company-name">Ebru Özkurt Topçu</span>
-                </div>
-                <div class="drive-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M15 3h6v6" />
-                        <path d="M10 14 21 3" />
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                    </svg>
-                    Aç
-                </div>
-            </a>
-        </main>
+        <div class="tabs-nav">
+            <button class="tab-btn active" onclick="switchTab('posts')">Çalışmalar</button>
+            <button class="tab-btn" onclick="switchTab('jobs')">İş Takibi</button>
+        </div>
+
+        <!-- Posts Tab -->
+        <div id="tab-posts" class="tab-content active">
+            <main id="links-container" class="links-grid">
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
+            </main>
+        </div>
+
+        <!-- Job Tracking Tab -->
+        <div id="tab-jobs" class="tab-content">
+            <form class="admin-form" onsubmit="event.preventDefault(); addJob();">
+                <input type="text" id="job-title" placeholder="Yeni iş adını yaz...">
+                <button type="submit">Ekle</button>
+            </form>
+
+            <div id="jobs-container">
+                <!-- Dinamik olarak dolacak -->
+            </div>
+        </div>
 
         <footer>
             <p>&copy; Jasmin Digital</p>
         </footer>
     </div>
+    <script src="supabase-config.js"></script>
+    <script>
+        // Tab Switching Logic
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            if (tabName === 'posts') {
+                document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+                document.getElementById('tab-posts').classList.add('active');
+            } else {
+                document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+                document.getElementById('tab-jobs').classList.add('active');
+                fetchJobs();
+            }
+        }
+
+        async function fetchLinks() {
+            const { data, error } = await sb.from('posts').select('*').order('has_new', { ascending: false }).order('name');
+            if (error) {
+                console.error(error);
+                return;
+            }
+            renderLinks(data);
+        }
+
+        function renderLinks(links) {
+            const container = document.getElementById('links-container');
+            container.innerHTML = links.map(link => `
+                <a href="${link.drive_url || '#'}" class="link-card" target="_blank">
+                    ${link.has_new ? '<div class="badge">YENİ</div>' : ''}
+                    <img src="${link.image_url}" alt="${link.name}" class="profile-img">
+                    <div class="card-content">
+                        <span class="company-name">${link.name}</span>
+                    </div>
+                    <div class="drive-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M15 3h6v6" />
+                            <path d="M10 14 21 3" />
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                        </svg>
+                        Aç
+                    </div>
+                </a>
+            `).join('');
+        }
+
+        // Job Tracking Logic
+        async function fetchJobs() {
+            const { data, error } = await sb.from('jobs').select('*');
+            if (error) {
+                console.error(error);
+                return;
+            }
+
+            const sortedData = data.sort((a, b) => {
+                if (a.is_completed !== b.is_completed) return a.is_completed ? 1 : -1;
+                if (!a.is_completed) return (a.position || 0) - (b.position || 0);
+                return new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at);
+            });
+
+            renderJobs(sortedData);
+            initSortable();
+        }
+
+        let sortable;
+        function initSortable() {
+            const el = document.getElementById('jobs-container');
+            if (sortable) sortable.destroy();
+
+            sortable = new Sortable(el, {
+                animation: 200,
+                ghostClass: 'sortable-ghost',
+                chosenClass: 'sortable-chosen',
+                dragClass: 'sortable-drag',
+                handle: '.drag-handle',
+                onEnd: async function () {
+                    const items = el.querySelectorAll('.job-card');
+                    const updates = Array.from(items).map((item, index) => ({
+                        id: item.id.replace('job-', ''),
+                        position: index
+                    }));
+                    await Promise.all(updates.map(u =>
+                        sb.from('jobs').update({ position: u.position }).eq('id', u.id)
+                    ));
+                    fetchJobs();
+                }
+            });
+        }
+
+        function renderJobs(jobs) {
+            const container = document.getElementById('jobs-container');
+            container.innerHTML = jobs.map(job => `
+                <div class="job-card ${job.is_completed ? 'completed' : ''}" id="job-${job.id}">
+                    <div class="drag-handle">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="16" y2="6"></line><line x1="8" y1="12" x2="16" y2="12"></line><line x1="8" y1="18" x2="16" y2="18"></line></svg>
+                    </div>
+                    <div class="job-info">
+                        <span class="job-title">${job.title}</span>
+                    </div>
+                    <div class="job-actions">
+                        <button class="btn-complete" title="Tamamlandı" onclick="toggleJob('${job.id}', ${!job.is_completed})">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </button>
+                        <button class="btn-delete" title="Sil" onclick="deleteJob('${job.id}')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function addJob() {
+            const title = document.getElementById('job-title').value;
+            if (!title) return;
+            const { error } = await sb.from('jobs').insert([{ title, is_completed: false }]);
+            if (error) alert("Hata!");
+            else {
+                document.getElementById('job-title').value = '';
+                fetchJobs();
+            }
+        }
+
+        async function toggleJob(id, status) {
+            await sb.from('jobs').update({ is_completed: status, updated_at: new Date().toISOString() }).eq('id', id);
+            fetchJobs();
+        }
+
+        async function deleteJob(id) {
+            if (confirm('Silinsin mi?')) {
+                await sb.from('jobs').delete().eq('id', id);
+                fetchJobs();
+            }
+        }
+
+        fetchLinks();
+    </script>
 </body>
 
 </html>
