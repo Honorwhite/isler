@@ -101,7 +101,7 @@
                     </div>
                     <div class="form-group">
                         <label>Saat</label>
-                        <input type="time" id="shoot-time" required>
+                        <input type="time" id="shoot-time" step="60" required>
                     </div>
                     <div class="modal-actions">
                         <button type="button" class="btn-cancel" onclick="closeModal()">Vazgeç</button>
@@ -130,7 +130,7 @@
                             <input type="text" id="quick-shoot-name" placeholder="Kişi adı..." required>
                         </div>
                         <div class="form-group" style="display: flex; gap: 0.5rem;">
-                            <input type="time" id="quick-shoot-time" required>
+                            <input type="time" id="quick-shoot-time" step="60" required>
                             <button type="submit" class="btn-save" style="flex: 0 0 80px; padding: 0.5rem;">Ekle</button>
                         </div>
                     </form>
@@ -287,6 +287,12 @@
 
         fetchLinks();
 
+        // Helper to ensure 24h format
+        function formatTime(timeStr) {
+            if (!timeStr) return "";
+            return timeStr.split(':').slice(0, 2).join(':');
+        }
+
         // Calendar Logic
         let currentDate = new Date();
         let shootings = [];
@@ -325,7 +331,7 @@
                 ? dayShootings.map(s => `
                     <div class="shooting-list-item">
                         <div class="shooting-list-info">
-                            <span class="shooting-list-time">${s.time.substring(0,5)}</span>
+                            <span class="shooting-list-time">${formatTime(s.time)}</span>
                             <span class="shooting-list-name">${s.name}</span>
                         </div>
                         <div class="shooting-list-actions">
@@ -467,7 +473,7 @@
                 dayShootings.forEach(s => {
                     const item = document.createElement('div');
                     item.className = 'shooting-item';
-                    item.innerText = `${s.time.substring(0,5)} - ${s.name}`;
+                    item.innerText = `${formatTime(s.time)} - ${s.name}`;
                     dayEl.appendChild(item);
                 });
 
