@@ -473,7 +473,7 @@
                 dayShootings.forEach(s => {
                     const item = document.createElement('div');
                     item.className = 'shooting-item';
-                    item.innerText = `${formatTime(s.time)} - ${s.name}`;
+                    item.innerHTML = `<span class="s-time">${formatTime(s.time)}</span><span class="s-name">${s.name}</span>`;
                     dayEl.appendChild(item);
                 });
 
