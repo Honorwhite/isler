@@ -116,7 +116,7 @@
             margin-top: 0.5rem;
         }
 
-        .btn-edit {
+        .btn-edit, .btn-instagram {
             background: rgba(255, 255, 255, 0.03);
             color: var(--text-secondary);
             border: 1px solid var(--glass-border);
@@ -132,6 +132,12 @@
         .btn-edit:hover {
             background: rgba(255, 255, 255, 0.1);
             color: var(--accent-color);
+        }
+
+        .btn-instagram:hover {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            color: white;
+            border-color: transparent;
         }
 
         .btn-save {
@@ -189,6 +195,7 @@
                     <input type="text" id="post-name" placeholder="Firma Adı" required>
                     <input type="text" id="post-image" placeholder="Resim URL (assets/peri.jpg gibi)" required>
                     <input type="text" id="post-drive" placeholder="Drive URL" required>
+                    <input type="text" id="post-instagram" placeholder="Instagram URL (isteğe bağlı)">
                     <button type="submit">Firma Ekle</button>
                 </div>
             </form>
@@ -266,6 +273,7 @@
                             <input type="text" id="edit-name-${link.id}" value="${link.name}" placeholder="Firma Adı">
                             <input type="text" id="edit-image-${link.id}" value="${link.image_url}" placeholder="Resim URL">
                             <input type="text" id="edit-drive-${link.id}" value="${link.drive_url || ''}" placeholder="Drive URL">
+                            <input type="text" id="edit-instagram-${link.id}" value="${link.instagram_url || ''}" placeholder="Instagram URL">
                             <div class="edit-actions">
                                 <button class="btn-save" onclick="savePost('${link.id}')">Kaydet</button>
                                 <button class="btn-cancel" onclick="toggleEdit('${link.id}', false)">İptal</button>
@@ -274,6 +282,11 @@
                     </div>
                     
                     <div style="display: flex; gap: 0.5rem;">
+                        ${link.instagram_url ? `
+                        <button class="btn-instagram" title="Instagram" onclick="openInstagram('${link.instagram_url}')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                        </button>
+                        ` : ''}
                         <button class="btn-edit" title="Düzenle" onclick="toggleEdit('${link.id}', true)">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                         </button>
@@ -298,11 +311,12 @@
             const name = document.getElementById(`edit-name-${id}`).value;
             const image_url = document.getElementById(`edit-image-${id}`).value;
             const drive_url = document.getElementById(`edit-drive-${id}`).value;
+            const instagram_url = document.getElementById(`edit-instagram-${id}`).value;
 
             const card = document.getElementById(`card-${id}`);
             card.classList.add('updating');
 
-            const { error } = await sb.from('posts').update({ name, image_url, drive_url }).eq('id', id);
+            const { error } = await sb.from('posts').update({ name, image_url, drive_url, instagram_url }).eq('id', id);
 
             if (error) {
                 alert("Güncelleme hatası!");
@@ -317,8 +331,9 @@
             const name = document.getElementById('post-name').value;
             const image_url = document.getElementById('post-image').value;
             const drive_url = document.getElementById('post-drive').value;
+            const instagram_url = document.getElementById('post-instagram').value;
 
-            const { error } = await sb.from('posts').insert([{ name, image_url, drive_url, has_new: false }]);
+            const { error } = await sb.from('posts').insert([{ name, image_url, drive_url, instagram_url, has_new: false }]);
 
             if (error) {
                 alert("Ekleme hatası!");
@@ -327,8 +342,19 @@
                 document.getElementById('post-name').value = '';
                 document.getElementById('post-image').value = '';
                 document.getElementById('post-drive').value = '';
+                document.getElementById('post-instagram').value = '';
                 fetchLinks();
             }
+        }
+
+        function openInstagram(url) {
+            if (!url) return;
+            if (!url.startsWith('http')) url = 'https://' + url;
+            const width = 450;
+            const height = 800;
+            const left = (screen.width - width) / 2;
+            const top = (screen.height - height) / 2;
+            window.open(url, 'Instagram', `width=${width},height=${height},top=${top},left=${left},menubar=no,toolbar=no,location=no,status=no`);
         }
 
         async function deletePost(id) {
