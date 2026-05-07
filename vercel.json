@@ -2,14 +2,15 @@
   "cleanUrls": true,
   "routes": [
     {
-      "handle": "filesystem"
-    },
-    {
       "src": "/admin",
       "dest": "/admin.html"
     },
     {
-      "src": "/(.*)",
+      "src": "/esthelabs(/?)",
+      "dest": "/presentation.html"
+    },
+    {
+      "src": "/([^/]+)(/?)",
       "dest": "/presentation.html"
     }
   ]
