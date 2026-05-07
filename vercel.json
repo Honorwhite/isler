@@ -7,7 +7,7 @@
     },
     {
       "source": "/:slug",
-      "destination": "/presentation.html?slug=:slug"
+      "destination": "/presentation.html"
     }
   ]
 }

@@ -18,6 +18,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const urlParams = new URLSearchParams(window.location.search);
     let slug = urlParams.get('slug');
 
+    // If no slug in query param, try to get it from the pathname (for Vercel rewrites)
+    if (!slug) {
+        const path = window.location.pathname.replace(/^\/|\/$/g, '');
+        if (path && path !== 'presentation.html' && path !== 'index.html' && path !== 'admin.html') {
+            slug = path;
+        }
+    }
+
     if (!slug) {
         const { data: clients } = await sb.from('sunum_clients').select('*').order('created_at', { ascending: true }).limit(1);
         if (clients && clients.length > 0) slug = clients[0].slug;
