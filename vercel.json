@@ -1,13 +1,16 @@
 {
   "cleanUrls": true,
-  "rewrites": [
+  "routes": [
     {
-      "source": "/admin",
-      "destination": "/admin.html"
+      "handle": "filesystem"
     },
     {
-      "source": "/:slug",
-      "destination": "/presentation.html"
+      "src": "/admin",
+      "dest": "/admin.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/presentation.html"
     }
   ]
 }
