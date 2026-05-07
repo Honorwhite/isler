@@ -1,17 +1,25 @@
 {
   "cleanUrls": true,
-  "rewrites": [
+  "routes": [
     {
-      "source": "/admin",
-      "destination": "/admin.html"
+      "src": "/admin",
+      "dest": "/admin.html"
     },
     {
-      "source": "/esthelabs",
-      "destination": "/presentation.html"
+      "src": "/",
+      "dest": "/index.html"
     },
     {
-      "source": "/:path*",
-      "destination": "/presentation.html"
+      "src": "/index",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/esthelabs",
+      "dest": "/presentation.html"
+    },
+    {
+      "src": "/((?!style|sunum|supabase|assets|favicon|apple-touch|site|web-app).*)",
+      "dest": "/presentation.html"
     }
   ]
 }
