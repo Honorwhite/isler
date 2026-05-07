@@ -6,7 +6,10 @@
       "destination": "/admin.html"
     },
     {
-      "source": "/((?!.*\\.).*)",
+      "handle": "filesystem"
+    },
+    {
+      "source": "/:slug",
       "destination": "/presentation.html"
     }
   ]
