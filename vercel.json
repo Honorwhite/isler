@@ -6,7 +6,7 @@
       "destination": "/admin.html"
     },
     {
-      "source": "/((?!admin|index|presentation|style|sunum|supabase|assets|favicon|apple-touch|site|web-app).*)",
+      "source": "/:slug",
       "destination": "/presentation.html"
     }
   ]
