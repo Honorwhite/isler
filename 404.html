@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sunum | Jasmin Digital</title>
+    <link rel="stylesheet" href="sunum.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+</head>
+
+<body class="presentation-body">
+
+    <div class="app-container">
+        <!-- App Header -->
+        <header class="app-header">
+            <div class="header-main">
+                <div class="brand-area">
+                    <div class="brand-details">
+                        <h1 id="client-name-display">Yükleniyor...</h1>
+                        <p id="post-count" class="post-count-text">...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="scroll-progress-container">
+                <div id="scroll-progress-bar" class="scroll-progress-bar"></div>
+            </div>
+        </header>
+
+
+        <!-- Main Content Area -->
+        <main id="main-content">
+            <!-- Flow View -->
+            <div id="flow-view" class="view-content">
+                <!-- Posts injected here -->
+            </div>
+
+            <!-- Grid View -->
+            <div id="grid-view" class="grid-view" style="display: none;">
+                <!-- Grid items injected here -->
+            </div>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <div class="nav-item active" id="nav-flow" onclick="switchView('flow')">
+                <i data-lucide="layout-list"></i>
+                <span>Akış</span>
+            </div>
+            <div class="nav-item" id="nav-grid" onclick="switchView('grid')">
+                <i data-lucide="grid"></i>
+                <span>Izgara</span>
+            </div>
+        </nav>
+
+        <footer style="margin-top: 3rem; text-align: center; color: #AEAEB2; padding-bottom: 2rem;">
+            <p style="font-weight: 600; font-size: 0.7rem; letter-spacing: 0.05em;">JASMIN DIGITAL</p>
+        </footer>
+    </div>
+
+    <!-- Fullscreen Lightbox -->
+    <div id="presentation-modal" class="modal">
+        <div class="modal-content">
+            <div id="modal-media-content" class="modal-media"></div>
+        </div>
+        <button class="close-btn" onclick="closeLightbox()">
+            <span>Kapat</span>
+            <i data-lucide="x"></i>
+        </button>
+    </div>
+
+    <script src="presentation.js"></script>
+</body>
+
+</html>

@@ -1,17 +1,9 @@
 {
   "cleanUrls": true,
-  "routes": [
+  "rewrites": [
     {
-      "src": "/admin",
-      "dest": "/admin.html"
-    },
-    {
-      "src": "/esthelabs(/?)",
-      "dest": "/presentation.html"
-    },
-    {
-      "src": "/([^/]+)(/?)",
-      "dest": "/presentation.html"
+      "source": "/admin",
+      "destination": "/admin.html"
     }
   ]
 }
