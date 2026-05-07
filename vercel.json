@@ -6,7 +6,11 @@
       "destination": "/admin.html"
     },
     {
-      "source": "/:slug",
+      "source": "/esthelabs",
+      "destination": "/presentation.html"
+    },
+    {
+      "source": "/:path*",
       "destination": "/presentation.html"
     }
   ]
