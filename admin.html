@@ -117,7 +117,7 @@
             margin-top: 0.5rem;
         }
 
-        .btn-edit, .btn-instagram {
+        .btn-edit, .btn-instagram, .btn-drive {
             background: rgba(255, 255, 255, 0.03);
             color: var(--text-secondary);
             border: 1px solid var(--glass-border);
@@ -137,6 +137,12 @@
 
         .btn-instagram:hover {
             background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .btn-drive:hover {
+            background: #4285F4;
             color: white;
             border-color: transparent;
         }
@@ -1032,6 +1038,11 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
                         </button>
                         ` : ''}
+                        ${link.drive_url ? `
+                        <button class="btn-drive" title="Google Drive" onclick="openDrive('${link.drive_url}')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                        </button>
+                        ` : ''}
                         <button class="btn-edit" title="Düzenle" onclick="toggleEdit('${link.id}', true)">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                         </button>
@@ -1100,6 +1111,16 @@
             const left = (screen.width - width) / 2;
             const top = (screen.height - height) / 2;
             window.open(url, 'Instagram', `width=${width},height=${height},top=${top},left=${left},menubar=no,toolbar=no,location=no,status=no`);
+        }
+
+        function openDrive(url) {
+            if (!url) return;
+            if (!url.startsWith('http')) url = 'https://' + url;
+            const width = 1000;
+            const height = 750;
+            const left = (screen.width - width) / 2;
+            const top = (screen.height - height) / 2;
+            window.open(url, 'GoogleDrive', `width=${width},height=${height},top=${top},left=${left},menubar=no,toolbar=no,location=no,status=no`);
         }
 
         async function deletePost(id) {
