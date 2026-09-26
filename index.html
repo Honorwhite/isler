@@ -65,8 +65,15 @@
         }
 
         @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .copy-field {
@@ -159,7 +166,15 @@
         <!-- Shooting Calendar Tab -->
         <div id="tab-calendar" class="tab-content">
             <button class="btn-plan" onclick="openModal()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><line x1="12" y1="14" x2="12" y2="20"></line><line x1="9" y1="17" x2="15" y2="17"></line></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                    <line x1="12" y1="14" x2="12" y2="20"></line>
+                    <line x1="9" y1="17" x2="15" y2="17"></line>
+                </svg>
                 Çekim Planla
             </button>
 
@@ -167,10 +182,16 @@
                 <div class="calendar-title" id="month-display">Nisan 2024</div>
                 <div class="calendar-nav">
                     <button onclick="changeMonth(-1)">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
                     </button>
                     <button onclick="changeMonth(1)">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
                     </button>
                 </div>
             </div>
@@ -183,34 +204,46 @@
         <!-- Passwords Tab -->
         <div id="tab-passwords" class="tab-content">
             <div style="margin-bottom: 2rem;">
-                <button onclick="document.getElementById('main-pass-form').style.display = 'block'; this.style.display='none';" id="btn-show-main-form" style="width: 100%; background: rgba(168, 85, 247, 0.1); color: var(--accent-color); border: 1px dashed var(--accent-color); padding: 1rem; border-radius: 16px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <button
+                    onclick="document.getElementById('main-pass-form').style.display = 'block'; this.style.display='none';"
+                    id="btn-show-main-form"
+                    style="width: 100%; background: rgba(168, 85, 247, 0.1); color: var(--accent-color); border: 1px dashed var(--accent-color); padding: 1rem; border-radius: 16px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;">
                     <i data-lucide="plus-circle"></i>
                     <span>Yeni Müşteri / Hesap Ekle</span>
                 </button>
 
-                <form id="main-pass-form" class="admin-form" onsubmit="event.preventDefault(); addPassword();" style="display: none; background: rgba(255,255,255,0.03); padding: 1.5rem; border-radius: 20px; border: 1px solid var(--glass-border);">
+                <form id="main-pass-form" class="admin-form" onsubmit="event.preventDefault(); addPassword();"
+                    style="display: none; background: rgba(255,255,255,0.03); padding: 1.5rem; border-radius: 20px; border: 1px solid var(--glass-border);">
                     <div style="display: grid; gap: 1rem;">
                         <div class="qa-field">
                             <i data-lucide="building"></i>
-                            <input type="text" id="vault-title" placeholder="Müşteri / Firma Adı" required style="background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: white; padding: 0.8rem 0.8rem 0.8rem 2.5rem; border-radius: 12px; width: 100%;">
+                            <input type="text" id="vault-title" placeholder="Müşteri / Firma Adı" required
+                                style="background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: white; padding: 0.8rem 0.8rem 0.8rem 2.5rem; border-radius: 12px; width: 100%;">
                         </div>
                         <div class="qa-field">
                             <i data-lucide="globe"></i>
-                            <input type="text" id="vault-instagram" placeholder="Platform (Instagram, Gmail...)" required style="background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: white; padding: 0.8rem 0.8rem 0.8rem 2.5rem; border-radius: 12px; width: 100%;">
+                            <input type="text" id="vault-instagram" placeholder="Platform (Instagram, Gmail...)"
+                                required
+                                style="background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: white; padding: 0.8rem 0.8rem 0.8rem 2.5rem; border-radius: 12px; width: 100%;">
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                             <div class="qa-field">
                                 <i data-lucide="user"></i>
-                                <input type="text" id="vault-user" placeholder="Kullanıcı Adı" required style="background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: white; padding: 0.8rem 0.8rem 0.8rem 2.5rem; border-radius: 12px; width: 100%;">
+                                <input type="text" id="vault-user" placeholder="Kullanıcı Adı" required
+                                    style="background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: white; padding: 0.8rem 0.8rem 0.8rem 2.5rem; border-radius: 12px; width: 100%;">
                             </div>
                             <div class="qa-field">
                                 <i data-lucide="key"></i>
-                                <input type="text" id="vault-pass" placeholder="Şifre" required style="background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: white; padding: 0.8rem 0.8rem 0.8rem 2.5rem; border-radius: 12px; width: 100%;">
+                                <input type="text" id="vault-pass" placeholder="Şifre" required
+                                    style="background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: white; padding: 0.8rem 0.8rem 0.8rem 2.5rem; border-radius: 12px; width: 100%;">
                             </div>
                         </div>
                         <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
-                            <button type="submit" style="flex: 2; background: var(--accent-color); color: white; border: none; padding: 1rem; border-radius: 12px; font-weight: 700; cursor: pointer;">Kaydet</button>
-                            <button type="button" onclick="document.getElementById('main-pass-form').style.display = 'none'; document.getElementById('btn-show-main-form').style.display='flex';" style="flex: 1; background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--glass-border); padding: 1rem; border-radius: 12px; cursor: pointer;">Vazgeç</button>
+                            <button type="submit"
+                                style="flex: 2; background: var(--accent-color); color: white; border: none; padding: 1rem; border-radius: 12px; font-weight: 700; cursor: pointer;">Kaydet</button>
+                            <button type="button"
+                                onclick="document.getElementById('main-pass-form').style.display = 'none'; document.getElementById('btn-show-main-form').style.display='flex';"
+                                style="flex: 1; background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--glass-border); padding: 1rem; border-radius: 12px; cursor: pointer;">Vazgeç</button>
                         </div>
                     </div>
                 </form>
@@ -253,7 +286,7 @@
                     <h2 id="detail-day-name">Pazartesi</h2>
                     <span class="date-badge" id="detail-date-display">11 Nisan 2024</span>
                 </div>
-                
+
                 <div id="day-shootings-list">
                     <!-- List of shootings for this day -->
                 </div>
@@ -266,7 +299,8 @@
                         </div>
                         <div class="form-group" style="display: flex; gap: 0.5rem;">
                             <input type="time" id="quick-shoot-time" step="60" required>
-                            <button type="submit" class="btn-save" style="flex: 0 0 80px; padding: 0.5rem;">Ekle</button>
+                            <button type="submit" class="btn-save"
+                                style="flex: 0 0 80px; padding: 0.5rem;">Ekle</button>
                         </div>
                     </form>
                 </div>
@@ -278,7 +312,7 @@
         </div>
 
         <footer>
-            <p>&copy; Jasmin Digital</p>
+            <p>&copy;</p>
         </footer>
     </div>
     <script src="supabase-config.js"></script>
@@ -308,7 +342,7 @@
             if (btnIdx) {
                 document.querySelector(`.tab-btn:nth-child(${btnIdx})`).classList.add('active');
             }
-            
+
             const targetTab = document.getElementById(`tab-${tabName}`);
             if (targetTab) {
                 targetTab.classList.add('active');
@@ -322,7 +356,7 @@
             }
             if (tabName === 'sunum') loadClientsIndex();
             if (tabName === 'passwords') fetchPasswords();
-            
+
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
@@ -359,14 +393,14 @@
                 console.error(error);
                 return;
             }
-            
+
             // Group by Title
             const grouped = data.reduce((acc, item) => {
                 if (!acc[item.title]) acc[item.title] = [];
                 acc[item.title].push(item);
                 return acc;
             }, {});
-            
+
             renderPasswords(grouped);
         }
 
@@ -461,23 +495,23 @@
             const box = card.querySelector('#account-detail-box');
             const user = el.dataset.user;
             const pass = el.dataset.pass;
-            
+
             const detailUser = box.querySelector('#detail-user');
             const detailPass = box.querySelector('#detail-pass');
-            
+
             detailUser.dataset.val = user;
             detailUser.querySelector('.val-text').innerText = user;
-            
+
             detailPass.dataset.val = pass;
             detailPass.querySelector('.val-text').innerText = pass;
-            
+
             // Toggle
             if (box.style.display === 'block' && box.dataset.activeId === id) {
                 box.style.display = 'none';
             } else {
                 box.style.display = 'block';
                 box.dataset.activeId = id;
-                
+
                 // Highlight active badge
                 card.querySelectorAll('.account-badge').forEach(b => b.classList.remove('active'));
                 el.classList.add('active');
@@ -502,11 +536,11 @@
                 return;
             }
 
-            const { error } = await sb.from('vault').insert([{ 
-                title, 
-                instagram: platform, 
-                username, 
-                password 
+            const { error } = await sb.from('vault').insert([{
+                title,
+                instagram: platform,
+                username,
+                password
             }]);
 
             if (error) {
@@ -528,11 +562,11 @@
                 return;
             }
 
-            const { error } = await sb.from('vault').insert([{ 
-                title, 
-                instagram, 
-                username, 
-                password 
+            const { error } = await sb.from('vault').insert([{
+                title,
+                instagram,
+                username,
+                password
             }]);
 
             if (error) {
@@ -556,11 +590,11 @@
                 const originalBorder = el.style.borderColor;
                 el.style.background = 'rgba(168, 85, 247, 0.1)';
                 el.style.borderColor = 'var(--accent-color)';
-                
+
                 const span = el.querySelector('span');
                 const originalText = span.innerText;
                 span.innerText = 'Kopyalandı!';
-                
+
                 setTimeout(() => {
                     el.style.background = originalBg;
                     el.style.borderColor = originalBorder;
@@ -703,7 +737,9 @@
 
         function openModal() {
             document.getElementById('shooting-modal').classList.add('active');
-            document.getElementById('shoot-date').valueAsDate = new Date();
+            const now = new Date();
+            const localDateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+            document.getElementById('shoot-date').value = localDateStr;
         }
 
         function closeModal() {
@@ -721,17 +757,18 @@
 
             // Find shootings for this date
             const dayShootings = shootings.filter(s => s.date === dateStr);
-            dayShootings.sort((a,b) => a.time.localeCompare(b.time));
+            dayShootings.sort((a, b) => a.time.localeCompare(b.time));
 
-            // Format date for display
-            const dateObj = new Date(dateStr);
+            // Format date for display (parse YYYY-MM-DD in local time to avoid UTC shift)
+            const [y, m, d] = dateStr.split('-').map(Number);
+            const dateObj = new Date(y, m - 1, d);
             const days = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
             const months = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
-            
+
             dayNameDisplay.innerText = days[dateObj.getDay()];
             dateDisplay.innerText = `${dateObj.getDate()} ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
 
-            list.innerHTML = dayShootings.length > 0 
+            list.innerHTML = dayShootings.length > 0
                 ? dayShootings.map(s => `
                     <div class="shooting-list-item">
                         <div class="shooting-list-info">
@@ -756,7 +793,7 @@
 
         async function deleteShooting(id) {
             if (!confirm('Bu çekim kaydını silmek istediğinize emin misiniz?')) return;
-            
+
             const { error } = await sb.from('shootings').delete().eq('id', id);
             if (error) {
                 alert("Hata: " + error.message);
@@ -768,7 +805,7 @@
 
         async function saveShooting(isQuick = false) {
             let name, date, time;
-            
+
             if (isQuick) {
                 name = document.getElementById('quick-shoot-name').value;
                 date = selectedDate;
@@ -802,13 +839,14 @@
             // Fetch for current view month
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
-            const startOfMonth = new Date(year, month, 1).toISOString();
-            const endOfMonth = new Date(year, month + 1, 0).toISOString();
+            const lastDay = new Date(year, month + 1, 0).getDate();
+            const startOfMonth = `${year}-${String(month + 1).padStart(2, '0')}-01`;
+            const endOfMonth = `${year}-${String(month + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
 
             const { data, error } = await sb.from('shootings')
                 .select('*')
-                .gte('date', startOfMonth.split('T')[0])
-                .lte('date', endOfMonth.split('T')[0]);
+                .gte('date', startOfMonth)
+                .lte('date', endOfMonth);
 
             if (error) {
                 console.error(error);
@@ -819,6 +857,7 @@
         }
 
         function changeMonth(delta) {
+            currentDate.setDate(1);
             currentDate.setMonth(currentDate.getMonth() + delta);
             fetchShootings();
         }
@@ -826,15 +865,15 @@
         function renderCalendar() {
             const grid = document.getElementById('calendar-grid');
             const monthDisplay = document.getElementById('month-display');
-            
+
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
-            
+
             const monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
             monthDisplay.innerText = `${monthNames[month]} ${year}`;
 
             grid.innerHTML = '';
-            
+
             // Day Headers
             const days = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
             days.forEach(day => {
@@ -846,7 +885,7 @@
 
             const firstDay = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
-            
+
             // Adjust firstDay (JS 0=Sun, we want 0=Mon)
             const offset = firstDay === 0 ? 6 : firstDay - 1;
 
@@ -867,13 +906,13 @@
                 }
 
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-                
+
                 dayEl.onclick = () => openDayDetails(dateStr);
                 dayEl.innerHTML = `<div class="day-number">${d}</div>`;
-                
+
                 const dayShootings = shootings.filter(s => s.date === dateStr);
-                dayShootings.sort((a,b) => a.time.localeCompare(b.time));
-                
+                dayShootings.sort((a, b) => a.time.localeCompare(b.time));
+
                 dayShootings.forEach(s => {
                     const item = document.createElement('div');
                     item.className = 'shooting-item';

@@ -114,7 +114,7 @@ function renderViews(posts) {
         <div class="grid-item ${post.type === 'reel' ? 'reel' : ''} ${post.type === 'carousel' ? 'carousel' : ''}" 
              onclick="openLightbox(${index}, this)">
             ${post.type === 'reel' || post.type === 'video' ? `
-                <video src="${post.media_url}" muted loop></video>
+                <video src="${post.media_url}" crossorigin="anonymous" muted loop></video>
                 <div class="badge-icon"><i data-lucide="play" style="width: 14px; fill: white;"></i></div>
             ` : post.type === 'carousel' ? `
                 <img src="${post.media_url}" alt="">
@@ -137,8 +137,8 @@ function renderViews(posts) {
                     <div class="carousel-track" onscroll="handleCarouselScroll(this, ${postIdx})">
                         ${items.map(url => `
                             <div class="carousel-slide" style="position: relative;">
-                                ${url.match(/\.(mp4|mov|webm|blob|media)/i) ?
-                    `<video src="${url}" onpointerdown="toggleVideo(event, this)" ${isGlobalMuted ? 'muted' : ''} loop playsinline></video>
+                                ${url.match(/\.(mp4|mov|webm|blob)/i) || url.includes('alt=media') ?
+                    `<video src="${url}" crossorigin="anonymous" onpointerdown="toggleVideo(event, this)" ${isGlobalMuted ? 'muted' : ''} loop playsinline></video>
                                      <button class="volume-btn ${isGlobalMuted ? 'muted' : ''}" onclick="toggleGlobalMute(event)">
                                         <i data-lucide="volume-2"></i>
                                         <i data-lucide="volume-x"></i>
@@ -157,7 +157,7 @@ function renderViews(posts) {
             mediaHTML = `
                 <div class="post-media-wrapper">
                     ${post.type === 'reel' || post.type === 'video' ? `
-                        <video src="${post.media_url}" onpointerdown="toggleVideo(event, this)" ${isGlobalMuted ? 'muted' : ''} loop playsinline></video>
+                        <video src="${post.media_url}" crossorigin="anonymous" onpointerdown="toggleVideo(event, this)" ${isGlobalMuted ? 'muted' : ''} loop playsinline></video>
                         <button class="volume-btn ${isGlobalMuted ? 'muted' : ''}" onclick="toggleGlobalMute(event)">
                             <i data-lucide="volume-2"></i>
                             <i data-lucide="volume-x"></i>
@@ -236,8 +236,8 @@ window.openLightbox = (index, el) => {
                 <div class="carousel-track" onscroll="handleCarouselScroll(this, 'modal')" style="display: flex; overflow-x: auto; scroll-snap-type: x mandatory; height: 100%; width: 100%;">
                     ${items.map(url => `
                         <div class="carousel-slide" style="min-width: 100vw; height: 100vh; scroll-snap-align: start; display: flex; align-items: center; justify-content: center; background: transparent; position: relative;">
-                            ${url.match(/\.(mp4|mov|webm|blob)/i) ?
-                `<video src="${url}" class="modal-media-item" onpointerdown="toggleVideo(event, this)" autoplay ${isGlobalMuted ? 'muted' : ''} loop playsinline></video>
+                            ${url.match(/\.(mp4|mov|webm|blob)/i) || url.includes('alt=media') ?
+                `<video src="${url}" crossorigin="anonymous" class="modal-media-item" onpointerdown="toggleVideo(event, this)" autoplay ${isGlobalMuted ? 'muted' : ''} loop playsinline></video>
                                  <button class="volume-btn ${isGlobalMuted ? 'muted' : ''}" onclick="toggleGlobalMute(event)">
                                     <i data-lucide="volume-2"></i>
                                     <i data-lucide="volume-x"></i>
@@ -253,7 +253,7 @@ window.openLightbox = (index, el) => {
     } else if (post.type === 'reel' || post.type === 'video') {
         mediaContent.innerHTML = `
             <div style="position: relative; display: flex; align-items: center; justify-content: center;">
-                <video src="${post.media_url}" class="modal-media-item" onpointerdown="toggleVideo(event, this)" autoplay ${isGlobalMuted ? 'muted' : ''} loop></video>
+                <video src="${post.media_url}" crossorigin="anonymous" class="modal-media-item" onpointerdown="toggleVideo(event, this)" autoplay ${isGlobalMuted ? 'muted' : ''} loop></video>
                 <button class="volume-btn ${isGlobalMuted ? 'muted' : ''}" onclick="toggleGlobalMute(event)">
                     <i data-lucide="volume-2"></i>
                     <i data-lucide="volume-x"></i>

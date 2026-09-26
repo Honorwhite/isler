@@ -41,13 +41,13 @@ window.loadClients = async () => {
 };
 
 let editingClientId = null;
-window.openClientModal = () => { 
-    editingClientId = null; 
-    document.getElementById('client-modal-title').textContent = 'Yeni Müşteri'; 
-    document.getElementById('client-name').value = ''; 
-    document.getElementById('client-slug').value = ''; 
-    document.getElementById('client-subtitle').value = ''; 
-    document.getElementById('client-modal').classList.add('active'); 
+window.openClientModal = () => {
+    editingClientId = null;
+    document.getElementById('client-modal-title').textContent = 'Yeni Müşteri';
+    document.getElementById('client-name').value = '';
+    document.getElementById('client-slug').value = '';
+    document.getElementById('client-subtitle').value = '';
+    document.getElementById('client-modal').classList.add('active');
 };
 
 window.editClient = async (clientId) => {
@@ -105,7 +105,7 @@ async function handleFiles(files) {
     const isMerge = document.getElementById('merge-carousel').checked;
     progress.style.display = 'block';
     const selectedFiles = Array.from(files);
-    
+
     const { data: posts } = await sb.from('sunum_posts').select('*').eq('client_id', currentClientId).order('order');
     const existingPostsCount = posts ? posts.length : 0;
 
@@ -146,7 +146,7 @@ let mainSortable = null;
 window.loadExistingPosts = async (clientId) => {
     const container = document.getElementById('existing-posts');
     const { data: posts } = await sb.from('sunum_posts').select('*').eq('client_id', clientId).order('order', { ascending: true });
-    
+
     if (!posts) { container.innerHTML = ''; return; }
 
     if (mainSortable) {
@@ -157,7 +157,7 @@ window.loadExistingPosts = async (clientId) => {
     container.innerHTML = posts.map(post => `
         <div class="post-item" data-id="${post.id}" onclick="toggleSelect(this)">
             <div style="position:absolute; top:2px; left:2px; background:rgba(0,0,0,0.5); color:white; padding:2px; border-radius:4px; z-index:5;"><i data-lucide="grip-vertical" style="width: 14px;"></i></div>
-            ${post.type === 'video' ? `<video src="${post.media_url}" muted></video>` : post.type === 'carousel' ? `<img src="${post.media_url}"><div style="position:absolute;top:5px;right:30px;color:white;background:rgba(0,0,0,0.5);padding:2px 6px;border-radius:4px;font-size:10px;">Carousel</div><button onclick="event.stopPropagation(); manageCarousel('${post.id}')" style="position:absolute;top:5px;right:50px;background:rgba(0,122,255,0.9);color:white;border:none;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;"><i data-lucide="edit-3" style="width: 12px;"></i></button>` : `<img src="${post.media_url}">`}
+            ${post.type === 'video' ? `<video src="${post.media_url}" crossorigin="anonymous" muted></video>` : post.type === 'carousel' ? `<img src="${post.media_url}"><div style="position:absolute;top:5px;right:30px;color:white;background:rgba(0,0,0,0.5);padding:2px 6px;border-radius:4px;font-size:10px;">Carousel</div><button onclick="event.stopPropagation(); manageCarousel('${post.id}')" style="position:absolute;top:5px;right:50px;background:rgba(0,122,255,0.9);color:white;border:none;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;"><i data-lucide="edit-3" style="width: 12px;"></i></button>` : `<img src="${post.media_url}">`}
             <button onclick="event.stopPropagation(); deletePost('${post.id}')" class="post-item-delete"><i data-lucide="x" style="width: 12px;"></i></button>
             <input type="checkbox" class="post-item-select" onclick="event.stopPropagation(); updateSelection()">
         </div>
@@ -171,11 +171,11 @@ window.loadExistingPosts = async (clientId) => {
         ghostClass: 'sortable-ghost',
         onEnd: async () => {
             const items = Array.from(container.querySelectorAll('.post-item'));
-            const updates = items.map((item, index) => ({ 
-                id: item.dataset.id, 
-                order: index 
+            const updates = items.map((item, index) => ({
+                id: item.dataset.id,
+                order: index
             }));
-            
+
             for (const update of updates) {
                 await sb.from('sunum_posts')
                     .update({ order: update.order })
@@ -212,7 +212,7 @@ window.makeCarousel = async () => {
     const ids = selectedItems.map(item => item.dataset.id);
     const { data: posts } = await sb.from('sunum_posts').select('*').eq('client_id', currentClientId).order('order');
     if (!posts) return;
-    const selectedPosts = posts.filter(p => ids.includes(p.id)).sort((a,b) => a.order - b.order);
+    const selectedPosts = posts.filter(p => ids.includes(p.id)).sort((a, b) => a.order - b.order);
 
     const carouselUrls = [];
     selectedPosts.forEach(p => {
@@ -261,7 +261,7 @@ window.manageCarousel = async (postId) => {
 
     container.innerHTML = post.carousel_data.map((url, idx) => `
         <div class="carousel-edit-item" data-url="${url}" style="position:relative; aspect-ratio:1; background:#000; border-radius:8px; overflow:hidden; cursor:grab;">
-            ${url.match(/\.(mp4|mov|webm|blob|media)/i) ? `<video src="${url}" muted style="width:100%; height:100%; object-fit:cover;"></video>` : `<img src="${url}" style="width:100%; height:100%; object-fit:cover;">`}
+            ${url.match(/\.(mp4|mov|webm|blob)/i) || url.includes('alt=media') ? `<video src="${url}" crossorigin="anonymous" muted style="width:100%; height:100%; object-fit:cover;"></video>` : `<img src="${url}" style="width:100%; height:100%; object-fit:cover;">`}
             <div style="position:absolute; top:5px; left:5px; background:rgba(0,0,0,0.5); color:white; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px;">${idx + 1}</div>
         </div>
     `).join('');
@@ -279,9 +279,9 @@ window.saveCarouselOrder = async () => {
     const items = Array.from(container.querySelectorAll('.carousel-edit-item'));
     const newUrls = items.map(item => item.dataset.url);
 
-    const { error } = await sb.from('sunum_posts').update({ 
+    const { error } = await sb.from('sunum_posts').update({
         carousel_data: newUrls,
-        media_url: newUrls[0] 
+        media_url: newUrls[0]
     }).eq('id', currentEditingCarouselId);
 
     if (error) {
@@ -295,7 +295,7 @@ window.saveCarouselOrder = async () => {
 window.importFromDrive = async () => {
     const input = document.getElementById('drive-folder-url').value;
     if (!input) { alert('Lütfen klasör linkini veya ID değerini girin.'); return; }
-    
+
     let folderId = input;
     if (input.includes('/folders/')) {
         folderId = input.split('/folders/')[1].split('?')[0].split('/')[0];
@@ -307,12 +307,12 @@ window.importFromDrive = async () => {
     const progressText = document.getElementById('progress-text');
     const progressBar = document.getElementById('progress-bar');
     const progressPercent = document.getElementById('progress-percent');
-    
+
     progress.style.display = 'block';
     progressText.textContent = 'Drive klasörü taranıyor...';
 
     try {
-        const response = await fetch(`https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+trashed=false&key=${GOOGLE_API_KEY}&fields=files(id,name,mimeType)&pageSize=100`);
+        const response = await fetch(`https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+trashed=false&key=${GOOGLE_API_KEY}&fields=files(id,name,mimeType)&pageSize=100`, { credentials: 'omit' });
         const data = await response.json();
 
         if (data.error) throw new Error(data.error.message);
@@ -330,9 +330,9 @@ window.importFromDrive = async () => {
             progressPercent.textContent = percent + '%';
 
             if (item.mimeType === 'application/vnd.google-apps.folder') {
-                const subResponse = await fetch(`https://www.googleapis.com/drive/v3/files?q='${item.id}'+in+parents+and+trashed=false&key=${GOOGLE_API_KEY}&fields=files(id,name,mimeType)&pageSize=50`);
+                const subResponse = await fetch(`https://www.googleapis.com/drive/v3/files?q='${item.id}'+in+parents+and+trashed=false&key=${GOOGLE_API_KEY}&fields=files(id,name,mimeType)&pageSize=50`, { credentials: 'omit' });
                 const subData = await subResponse.json();
-                
+
                 if (subData.files && subData.files.length > 0) {
                     const subFiles = subData.files.filter(f => f.mimeType.startsWith('image/') || f.mimeType.startsWith('video/'));
                     if (subFiles.length > 0) {
@@ -353,7 +353,7 @@ window.importFromDrive = async () => {
                     }
                 }
             } else if (item.mimeType.startsWith('image/') || item.mimeType.startsWith('video/')) {
-                let directUrl = item.mimeType.startsWith('image/') 
+                let directUrl = item.mimeType.startsWith('image/')
                     ? `https://drive.google.com/thumbnail?id=${item.id}&sz=w1600`
                     : `https://www.googleapis.com/drive/v3/files/${item.id}?alt=media&key=${GOOGLE_API_KEY}`;
 
