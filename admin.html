@@ -846,12 +846,17 @@
         }
 
         // Passwords Logic
+        const vaultAccountsMap = new Map();
+
         async function fetchPasswords() {
             const { data, error } = await sb.from('vault').select('*').order('created_at', { ascending: false });
             if (error) {
                 console.error(error);
                 return;
             }
+
+            vaultAccountsMap.clear();
+            (data || []).forEach(item => vaultAccountsMap.set(String(item.id), item));
 
             // Group by Title
             const grouped = data.reduce((acc, item) => {
@@ -901,7 +906,7 @@
                     
                     <div style="display: flex; flex-wrap: wrap; gap: 0.8rem;">
                         ${accounts.map(acc => `
-                            <div class="account-badge" onclick="showAccountDetail('${acc.id}', this)" data-user="${acc.username}" data-pass="${acc.password}">
+                            <div class="account-badge" onclick="showAccountDetail('${acc.id}', this)">
                                 <span style="font-size: 0.95rem; font-weight: 600;">${getPlatformName(acc.instagram)}</span>
                             </div>
                         `).join('')}
@@ -909,19 +914,24 @@
                     
                     <div id="account-detail-box" class="detail-box" style="display: none;">
                         <div style="display: grid; gap: 0.8rem;">
-                            <div class="copy-field" onclick="copyToClipboard(this.dataset.val, this)" id="detail-user">
+                            <div class="copy-field" onclick="copyVaultField(this, 'user')" id="detail-user">
                                 <div style="display: flex; align-items: center; gap: 12px;">
                                     <i data-lucide="user" style="width: 16px; height: 16px; color: var(--accent-color);"></i>
                                     <span class="val-text" style="font-size: 0.95rem; font-weight: 500;"></span>
                                 </div>
                                 <i data-lucide="copy" style="width: 14px; height: 14px; opacity: 0.4;"></i>
                             </div>
-                            <div class="copy-field" onclick="copyToClipboard(this.dataset.val, this)" id="detail-pass">
+                            <div class="copy-field" onclick="copyVaultField(this, 'pass')" id="detail-pass">
                                 <div style="display: flex; align-items: center; gap: 12px;">
                                     <i data-lucide="key" style="width: 16px; height: 16px; color: var(--accent-color);"></i>
-                                    <span class="val-text" style="font-size: 0.95rem; font-weight: 500;"></span>
+                                    <span class="val-text" style="font-size: 0.95rem; font-weight: 500;">••••••••</span>
                                 </div>
-                                <i data-lucide="copy" style="width: 14px; height: 14px; opacity: 0.4;"></i>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <button type="button" onclick="event.stopPropagation(); toggleVaultPassReveal(this)" title="Göster/Gizle" style="background:none;border:none;color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;padding:2px;opacity:0.7;">
+                                        <i data-lucide="eye" style="width: 15px; height: 15px;"></i>
+                                    </button>
+                                    <i data-lucide="copy" style="width: 14px; height: 14px; opacity: 0.4;"></i>
+                                </div>
                             </div>
                         </div>
                         <button id="btn-delete-account" class="btn-delete" style="width: 100%; margin-top: 1rem; background: rgba(237, 73, 86, 0.1); color: #ed4956; border: 1px solid rgba(237, 73, 86, 0.2); border-radius: 12px; padding: 0.8rem; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
@@ -956,32 +966,51 @@
         window.showAccountDetail = (id, el) => {
             const card = el.closest('.link-card');
             const box = card.querySelector('#account-detail-box');
-            const user = el.dataset.user;
-            const pass = el.dataset.pass;
+            const acc = vaultAccountsMap.get(String(id));
+            if (!acc) return;
 
             const detailUser = box.querySelector('#detail-user');
             const detailPass = box.querySelector('#detail-pass');
 
-            detailUser.dataset.val = user;
-            detailUser.querySelector('.val-text').innerText = user;
-
-            detailPass.dataset.val = pass;
-            detailPass.querySelector('.val-text').innerText = pass;
+            detailUser.querySelector('.val-text').innerText = acc.username || '-';
+            detailPass.querySelector('.val-text').innerText = '••••••••';
+            detailPass.dataset.revealed = 'false';
 
             const deleteBtn = box.querySelector('#btn-delete-account');
             deleteBtn.onclick = () => deletePassword(id);
 
             // Toggle
-            if (box.style.display === 'block' && box.dataset.activeId === id) {
+            if (box.style.display === 'block' && box.dataset.activeId === String(id)) {
                 box.style.display = 'none';
             } else {
                 box.style.display = 'block';
-                box.dataset.activeId = id;
+                box.dataset.activeId = String(id);
 
                 // Highlight active badge
                 card.querySelectorAll('.account-badge').forEach(b => b.classList.remove('active'));
                 el.classList.add('active');
             }
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        };
+
+        window.copyVaultField = (el, field) => {
+            const box = el.closest('#account-detail-box');
+            const acc = box ? vaultAccountsMap.get(String(box.dataset.activeId)) : null;
+            if (!acc) return;
+            const val = field === 'pass' ? acc.password : acc.username;
+            copyToClipboard(val, el);
+        };
+
+        window.toggleVaultPassReveal = (btn) => {
+            const detailPass = btn.closest('#detail-pass');
+            const box = btn.closest('#account-detail-box');
+            const acc = box ? vaultAccountsMap.get(String(box.dataset.activeId)) : null;
+            if (!acc || !detailPass) return;
+
+            const isRevealed = detailPass.dataset.revealed === 'true';
+            detailPass.dataset.revealed = isRevealed ? 'false' : 'true';
+            detailPass.querySelector('.val-text').innerText = isRevealed ? '••••••••' : (acc.password || '-');
+            btn.innerHTML = `<i data-lucide="${isRevealed ? 'eye' : 'eye-off'}" style="width: 15px; height: 15px;"></i>`;
             if (typeof lucide !== 'undefined') lucide.createIcons();
         };
 

@@ -1,68 +1,12 @@
-// Jasmin Digital - Unified Secure Auth Module
-// Supports real Supabase Auth (JWT + RLS) with PBKDF2-SHA256 fallback & Remember Me
+// Jasmin Digital - Pure Supabase Auth Module (JWT + RLS, Zero Fallback Passwords)
 (function () {
     const ADMIN_EMAIL = 'admin@jasmindigital.com';
 
-    // PBKDF2-SHA256 (100,000 iterations) fallback credentials - no plaintext password in source
-    const PBKDF2_SALT_B64 = '0URkSCVQcEaImzDijt95ew==';
-    const PBKDF2_HASH_HEX = 'cdf02e466f8fd88fc9a7f5bd3dcf92709707288af58abeb9f5ff87b179058565';
-    const PBKDF2_ITERATIONS = 100000;
-
-    const STORAGE_KEY = 'jasmin_auth_session_v2';
+    const MODE_KEY = 'jasmin_auth_mode';
+    const TAB_SESSION_KEY = 'jasmin_auth_tab_active';
     const LOCKOUT_KEY = 'jasmin_auth_lockout_v2';
-    const REMEMBER_DURATION_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
     const MAX_ATTEMPTS = 5;
-    const LOCKOUT_MS = 30 * 1000; // 30 seconds
-
-    function base64ToBytes(b64) {
-        const bin = atob(b64);
-        const bytes = new Uint8Array(bin.length);
-        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-        return bytes;
-    }
-
-    function bytesToHex(buffer) {
-        return Array.from(new Uint8Array(buffer))
-            .map(b => b.toString(16).padStart(2, '0'))
-            .join('');
-    }
-
-    function constantTimeEqual(a, b) {
-        if (typeof a !== 'string' || typeof b !== 'string' || a.length !== b.length) return false;
-        let diff = 0;
-        for (let i = 0; i < a.length; i++) {
-            diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
-        }
-        return diff === 0;
-    }
-
-    async function verifyPbkdf2(password) {
-        if (!window.crypto || !window.crypto.subtle) return false;
-        try {
-            const enc = new TextEncoder();
-            const keyMaterial = await crypto.subtle.importKey(
-                'raw',
-                enc.encode(password),
-                { name: 'PBKDF2' },
-                false,
-                ['deriveBits']
-            );
-            const derived = await crypto.subtle.deriveBits(
-                {
-                    name: 'PBKDF2',
-                    salt: base64ToBytes(PBKDF2_SALT_B64),
-                    iterations: PBKDF2_ITERATIONS,
-                    hash: 'SHA-256'
-                },
-                keyMaterial,
-                256
-            );
-            return constantTimeEqual(bytesToHex(derived), PBKDF2_HASH_HEX);
-        } catch (err) {
-            console.error('Hash verification error:', err);
-            return false;
-        }
-    }
+    const LOCKOUT_MS = 30 * 1000;
 
     function getLockoutState() {
         try {
@@ -89,56 +33,26 @@
         }
     }
 
-    function readStoredSession() {
-        const sources = [localStorage, sessionStorage];
-        for (const store of sources) {
-            try {
-                const raw = store.getItem(STORAGE_KEY);
-                if (!raw) continue;
-                const parsed = JSON.parse(raw);
-                if (parsed && parsed.verified && parsed.expiresAt > Date.now()) {
-                    return parsed;
-                }
-                store.removeItem(STORAGE_KEY);
-            } catch {
-                // ignore
-            }
-        }
-        return null;
-    }
+    async function isAuthenticated() {
+        if (!window.sb || !window.sb.auth) return false;
 
-    function saveStoredSession(remember, mode) {
-        const payload = JSON.stringify({
-            verified: true,
-            mode,
-            createdAt: Date.now(),
-            expiresAt: Date.now() + REMEMBER_DURATION_MS
-        });
+        // If user unchecked "Remember me", expire session once tab closes
         try {
-            localStorage.removeItem(STORAGE_KEY);
-            sessionStorage.removeItem(STORAGE_KEY);
-            if (remember) {
-                localStorage.setItem(STORAGE_KEY, payload);
-            } else {
-                sessionStorage.setItem(STORAGE_KEY, payload);
+            const mode = localStorage.getItem(MODE_KEY);
+            if (mode === 'session' && !sessionStorage.getItem(TAB_SESSION_KEY)) {
+                await logout();
+                return false;
             }
         } catch {
             // ignore
         }
-    }
 
-    async function isAuthenticated() {
-        // 1. Check real Supabase Auth session first
-        if (window.sb && window.sb.auth) {
-            try {
-                const { data } = await window.sb.auth.getSession();
-                if (data && data.session) return true;
-            } catch {
-                // fall through
-            }
+        try {
+            const { data, error } = await window.sb.auth.getSession();
+            return Boolean(!error && data && data.session);
+        } catch {
+            return false;
         }
-        // 2. Check remembered local/session token
-        return Boolean(readStoredSession());
     }
 
     async function login(password, remember = true) {
@@ -153,32 +67,39 @@
             return { ok: false, error: 'Lütfen şifrenizi girin.' };
         }
 
-        // 1. Try real Supabase Auth (JWT + RLS)
-        if (window.sb && window.sb.auth) {
-            try {
-                const { data, error } = await window.sb.auth.signInWithPassword({
-                    email: ADMIN_EMAIL,
-                    password: cleanPass
-                });
-                if (!error && data && data.session) {
-                    clearLockout();
-                    saveStoredSession(remember, 'supabase');
-                    return { ok: true, mode: 'supabase' };
+        if (!window.sb || !window.sb.auth) {
+            return { ok: false, error: 'Kimlik doğrulama servisi yüklenemedi.' };
+        }
+
+        try {
+            const { data, error } = await window.sb.auth.signInWithPassword({
+                email: ADMIN_EMAIL,
+                password: cleanPass
+            });
+
+            if (!error && data && data.session) {
+                clearLockout();
+                try {
+                    if (remember) {
+                        localStorage.setItem(MODE_KEY, 'persistent');
+                        sessionStorage.removeItem(TAB_SESSION_KEY);
+                    } else {
+                        localStorage.setItem(MODE_KEY, 'session');
+                        sessionStorage.setItem(TAB_SESSION_KEY, '1');
+                    }
+                    // Clean up any legacy keys
+                    localStorage.removeItem('jasmin_auth_session_v2');
+                    sessionStorage.removeItem('jasmin_auth_session_v2');
+                    sessionStorage.removeItem('isler_admin_auth');
+                } catch {
+                    // ignore
                 }
-            } catch {
-                // fall back to PBKDF2 check
+                return { ok: true };
             }
+        } catch (err) {
+            console.error('Auth error:', err);
         }
 
-        // 2. Fallback: Salted PBKDF2-SHA256 verification
-        const valid = await verifyPbkdf2(cleanPass);
-        if (valid) {
-            clearLockout();
-            saveStoredSession(remember, 'local');
-            return { ok: true, mode: 'local' };
-        }
-
-        // Track failed attempts
         const nextAttempts = (lock.attempts || 0) + 1;
         if (nextAttempts >= MAX_ATTEMPTS) {
             setLockoutState({ attempts: 0, until: Date.now() + LOCKOUT_MS });
@@ -194,8 +115,10 @@
 
     async function logout() {
         try {
-            localStorage.removeItem(STORAGE_KEY);
-            sessionStorage.removeItem(STORAGE_KEY);
+            localStorage.removeItem(MODE_KEY);
+            localStorage.removeItem('jasmin_auth_session_v2');
+            sessionStorage.removeItem(TAB_SESSION_KEY);
+            sessionStorage.removeItem('jasmin_auth_session_v2');
             sessionStorage.removeItem('isler_admin_auth');
         } catch {
             // ignore
@@ -209,7 +132,7 @@
         }
     }
 
-    // Modern Password Modal (replaces insecure browser prompt())
+    // Modern Password Modal (used by index.html Vault tab)
     let pendingCallback = null;
 
     function ensureModal() {
@@ -327,4 +250,3 @@
         closeLoginModal
     };
 })();
-
