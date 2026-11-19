@@ -146,13 +146,8 @@
 
         <!-- Job Tracking Tab -->
         <div id="tab-jobs" class="tab-content">
-            <form class="admin-form" onsubmit="event.preventDefault(); addJob();">
-                <input type="text" id="job-title" placeholder="Yeni iş adını yaz...">
-                <button type="submit">Ekle</button>
-            </form>
-
             <div id="jobs-container">
-                <!-- Dinamik olarak dolacak -->
+                <!-- Dinamik Kanban Panosu -->
             </div>
         </div>
 
@@ -203,6 +198,12 @@
 
         <!-- Passwords Tab -->
         <div id="tab-passwords" class="tab-content">
+            <div class="vault-lock-bar">
+                <button type="button" class="btn-vault-lock" onclick="lockVaultSession()">
+                    <i data-lucide="lock"></i>
+                    <span>Oturumu Kilitle</span>
+                </button>
+            </div>
             <div style="margin-bottom: 2rem;">
                 <button
                     onclick="document.getElementById('main-pass-form').style.display = 'block'; this.style.display='none';"
@@ -316,18 +317,16 @@
         </footer>
     </div>
     <script src="supabase-config.js"></script>
+    <script src="auth.js"></script>
+    <script src="jobs-board.js"></script>
     <script>
         // Tab Switching Logic
-        let isPasswordsAuthenticated = false;
-
-        function switchTab(tabName) {
-            // Check authentication for passwords
-            if (tabName === 'passwords' && !isPasswordsAuthenticated) {
-                const pass = prompt("Şifreler alanına erişmek için şifreyi girin:");
-                if (pass === 'jasmin2026') {
-                    isPasswordsAuthenticated = true;
-                } else {
-                    alert("Hatalı şifre!");
+        async function switchTab(tabName) {
+            // Check authentication for passwords via secure JasminAuth
+            if (tabName === 'passwords') {
+                const authed = await JasminAuth.isAuthenticated();
+                if (!authed) {
+                    JasminAuth.openLoginModal(() => switchTab('passwords'));
                     return;
                 }
             }
@@ -346,6 +345,12 @@
             const targetTab = document.getElementById(`tab-${tabName}`);
             if (targetTab) {
                 targetTab.classList.add('active');
+            }
+
+            // Widen container for Kanban board
+            const mainContainer = document.querySelector('.container');
+            if (mainContainer) {
+                mainContainer.classList.toggle('wide-view', tabName === 'jobs');
             }
 
             // Load data if needed
@@ -387,12 +392,25 @@
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
+        const vaultAccountsMap = new Map();
+
+        window.lockVaultSession = async () => {
+            await JasminAuth.logout();
+            vaultAccountsMap.clear();
+            const container = document.getElementById('passwords-container');
+            if (container) container.innerHTML = '';
+            switchTab('posts');
+        };
+
         async function fetchPasswords() {
             const { data, error } = await sb.from('vault').select('*').order('created_at', { ascending: false });
             if (error) {
                 console.error(error);
                 return;
             }
+
+            vaultAccountsMap.clear();
+            (data || []).forEach(item => vaultAccountsMap.set(String(item.id), item));
 
             // Group by Title
             const grouped = data.reduce((acc, item) => {
@@ -442,7 +460,7 @@
                     
                     <div style="display: flex; flex-wrap: wrap; gap: 0.8rem;">
                         ${accounts.map(acc => `
-                            <div class="account-badge" onclick="showAccountDetail('${acc.id}', this)" data-user="${acc.username}" data-pass="${acc.password}">
+                            <div class="account-badge" onclick="showAccountDetail('${acc.id}', this)">
                                 <span style="font-size: 0.95rem; font-weight: 600;">${getPlatformName(acc.instagram)}</span>
                             </div>
                         `).join('')}
@@ -450,19 +468,24 @@
                     
                     <div id="account-detail-box" class="detail-box" style="display: none;">
                         <div style="display: grid; gap: 0.8rem;">
-                            <div class="copy-field" onclick="copyToClipboard(this.dataset.val, this)" id="detail-user">
+                            <div class="copy-field" onclick="copyVaultField(this, 'user')" id="detail-user">
                                 <div style="display: flex; align-items: center; gap: 12px;">
                                     <i data-lucide="user" style="width: 16px; height: 16px; color: var(--accent-color);"></i>
                                     <span class="val-text" style="font-size: 0.95rem; font-weight: 500;"></span>
                                 </div>
                                 <i data-lucide="copy" style="width: 14px; height: 14px; opacity: 0.4;"></i>
                             </div>
-                            <div class="copy-field" onclick="copyToClipboard(this.dataset.val, this)" id="detail-pass">
+                            <div class="copy-field" onclick="copyVaultField(this, 'pass')" id="detail-pass">
                                 <div style="display: flex; align-items: center; gap: 12px;">
                                     <i data-lucide="key" style="width: 16px; height: 16px; color: var(--accent-color);"></i>
-                                    <span class="val-text" style="font-size: 0.95rem; font-weight: 500;"></span>
+                                    <span class="val-text" style="font-size: 0.95rem; font-weight: 500;">••••••••</span>
                                 </div>
-                                <i data-lucide="copy" style="width: 14px; height: 14px; opacity: 0.4;"></i>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <button type="button" onclick="event.stopPropagation(); toggleVaultPassReveal(this)" title="Göster/Gizle" style="background:none;border:none;color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;padding:2px;opacity:0.7;">
+                                        <i data-lucide="eye" style="width: 15px; height: 15px;"></i>
+                                    </button>
+                                    <i data-lucide="copy" style="width: 14px; height: 14px; opacity: 0.4;"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -493,29 +516,48 @@
         window.showAccountDetail = (id, el) => {
             const card = el.closest('.link-card');
             const box = card.querySelector('#account-detail-box');
-            const user = el.dataset.user;
-            const pass = el.dataset.pass;
+            const acc = vaultAccountsMap.get(String(id));
+            if (!acc) return;
 
             const detailUser = box.querySelector('#detail-user');
             const detailPass = box.querySelector('#detail-pass');
 
-            detailUser.dataset.val = user;
-            detailUser.querySelector('.val-text').innerText = user;
-
-            detailPass.dataset.val = pass;
-            detailPass.querySelector('.val-text').innerText = pass;
+            detailUser.querySelector('.val-text').innerText = acc.username || '-';
+            detailPass.querySelector('.val-text').innerText = '••••••••';
+            detailPass.dataset.revealed = 'false';
 
             // Toggle
-            if (box.style.display === 'block' && box.dataset.activeId === id) {
+            if (box.style.display === 'block' && box.dataset.activeId === String(id)) {
                 box.style.display = 'none';
             } else {
                 box.style.display = 'block';
-                box.dataset.activeId = id;
+                box.dataset.activeId = String(id);
 
                 // Highlight active badge
                 card.querySelectorAll('.account-badge').forEach(b => b.classList.remove('active'));
                 el.classList.add('active');
             }
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        };
+
+        window.copyVaultField = (el, field) => {
+            const box = el.closest('#account-detail-box');
+            const acc = box ? vaultAccountsMap.get(String(box.dataset.activeId)) : null;
+            if (!acc) return;
+            const val = field === 'pass' ? acc.password : acc.username;
+            copyToClipboard(val, el);
+        };
+
+        window.toggleVaultPassReveal = (btn) => {
+            const detailPass = btn.closest('#detail-pass');
+            const box = btn.closest('#account-detail-box');
+            const acc = box ? vaultAccountsMap.get(String(box.dataset.activeId)) : null;
+            if (!acc || !detailPass) return;
+
+            const isRevealed = detailPass.dataset.revealed === 'true';
+            detailPass.dataset.revealed = isRevealed ? 'false' : 'true';
+            detailPass.querySelector('.val-text').innerText = isRevealed ? '••••••••' : (acc.password || '-');
+            btn.innerHTML = `<i data-lucide="${isRevealed ? 'eye' : 'eye-off'}" style="width: 15px; height: 15px;"></i>`;
             if (typeof lucide !== 'undefined') lucide.createIcons();
         };
 
@@ -634,93 +676,7 @@
             `).join('');
         }
 
-        // Job Tracking Logic
-        async function fetchJobs() {
-            const { data, error } = await sb.from('jobs').select('*');
-            if (error) {
-                console.error(error);
-                return;
-            }
-
-            const sortedData = data.sort((a, b) => {
-                if (a.is_completed !== b.is_completed) return a.is_completed ? 1 : -1;
-                if (!a.is_completed) return (a.position || 0) - (b.position || 0);
-                return new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at);
-            });
-
-            renderJobs(sortedData);
-            initSortable();
-        }
-
-        let sortable;
-        function initSortable() {
-            const el = document.getElementById('jobs-container');
-            if (sortable) sortable.destroy();
-
-            sortable = new Sortable(el, {
-                animation: 200,
-                ghostClass: 'sortable-ghost',
-                chosenClass: 'sortable-chosen',
-                dragClass: 'sortable-drag',
-                handle: '.drag-handle',
-                onEnd: async function () {
-                    const items = el.querySelectorAll('.job-card');
-                    const updates = Array.from(items).map((item, index) => ({
-                        id: item.id.replace('job-', ''),
-                        position: index
-                    }));
-                    await Promise.all(updates.map(u =>
-                        sb.from('jobs').update({ position: u.position }).eq('id', u.id)
-                    ));
-                    fetchJobs();
-                }
-            });
-        }
-
-        function renderJobs(jobs) {
-            const container = document.getElementById('jobs-container');
-            container.innerHTML = jobs.map(job => `
-                <div class="job-card ${job.is_completed ? 'completed' : ''}" id="job-${job.id}">
-                    <div class="drag-handle">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="16" y2="6"></line><line x1="8" y1="12" x2="16" y2="12"></line><line x1="8" y1="18" x2="16" y2="18"></line></svg>
-                    </div>
-                    <div class="job-info">
-                        <span class="job-title">${job.title}</span>
-                    </div>
-                    <div class="job-actions">
-                        <button class="btn-complete" title="Tamamlandı" onclick="toggleJob('${job.id}', ${!job.is_completed})">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        </button>
-                        <button class="btn-delete" title="Sil" onclick="deleteJob('${job.id}')">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        async function addJob() {
-            const title = document.getElementById('job-title').value;
-            if (!title) return;
-            const { error } = await sb.from('jobs').insert([{ title, is_completed: false }]);
-            if (error) alert("Hata!");
-            else {
-                document.getElementById('job-title').value = '';
-                fetchJobs();
-            }
-        }
-
-        async function toggleJob(id, status) {
-            await sb.from('jobs').update({ is_completed: status, updated_at: new Date().toISOString() }).eq('id', id);
-            fetchJobs();
-        }
-
-        async function deleteJob(id) {
-            if (confirm('Silinsin mi?')) {
-                await sb.from('jobs').delete().eq('id', id);
-                fetchJobs();
-            }
-        }
+            // Job Tracking Logic is handled by jobs-board.js
 
         fetchLinks();
         if (typeof lucide !== 'undefined') lucide.createIcons();
