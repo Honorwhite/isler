@@ -25,17 +25,21 @@
     ];
 
     const LOCAL_APPROVAL_KEY = 'jasmin_jobs_approval_ids';
-    const DONE_PAGE_SIZE = 25;
+    const FULL_MONTHS_TR = [
+        'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+        'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+    ];
 
     let allJobs = [];
     let searchQuery = '';
-    let doneLimit = DONE_PAGE_SIZE;
     let hasStatusColumn = null;
     let sortables = [];
     let activeAddColumn = null;
     let editingJobId = null;
     let quickAddTarget = 'todo';
     let mobileActiveCol = 'all'; // 'all' | 'todo' | 'approval' | 'done'
+    const expandedDoneDays = new Set();
+    const expandedDoneMonths = new Set();
 
     function escapeHtml(str) {
         return String(str ?? '')
@@ -249,12 +253,138 @@
         initSortables();
     }
 
+    function toLocalDayKey(date) {
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    }
+
+    function toLocalMonthKey(date) {
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+    }
+
+    function formatDayGroupLabel(dayKey, todayKey, yesterdayKey) {
+        const [y, m, d] = dayKey.split('-').map(Number);
+        const base = `${d} ${FULL_MONTHS_TR[m - 1]}`;
+        if (dayKey === todayKey) return `Bugün · ${base}`;
+        if (dayKey === yesterdayKey) return `Dün · ${base}`;
+        return base;
+    }
+
+    function formatMonthGroupLabel(monthKey, currentYear) {
+        const [y, m] = monthKey.split('-').map(Number);
+        const name = FULL_MONTHS_TR[m - 1];
+        return y === currentYear ? `${name} Ayı` : `${name} ${y}`;
+    }
+
+    function renderDoneDayBlock(dayKey, dayJobs, todayKey, yesterdayKey, isSearching) {
+        const isOpen = isSearching || expandedDoneDays.has(dayKey);
+        const label = formatDayGroupLabel(dayKey, todayKey, yesterdayKey);
+        return `
+            <div class="done-group done-day-group ${isOpen ? 'is-open' : ''}">
+                <button type="button" class="done-group-header done-day-header" onclick="window.kanbanToggleDoneDay('${dayKey}')">
+                    <span class="done-group-left">
+                        <i data-lucide="chevron-right" class="done-chevron"></i>
+                        <span class="done-group-label">${label}</span>
+                    </span>
+                    <span class="done-group-count">${dayJobs.length} iş</span>
+                </button>
+                ${isOpen ? `
+                    <div class="done-day-items">
+                        ${dayJobs.map(job => renderCard(job, 'done')).join('')}
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    function renderDoneGrouped(items, isSearching) {
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonthKey = toLocalMonthKey(now);
+        const todayKey = toLocalDayKey(now);
+        const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+        const yesterdayKey = toLocalDayKey(yesterday);
+
+        // Group by month -> day
+        const monthsMap = new Map();
+        items.forEach(job => {
+            const rawDate = new Date(job.updated_at || job.created_at || Date.now());
+            const d = isNaN(rawDate.getTime()) ? now : rawDate;
+            const mKey = toLocalMonthKey(d);
+            const dKey = toLocalDayKey(d);
+
+            if (!monthsMap.has(mKey)) monthsMap.set(mKey, new Map());
+            const daysMap = monthsMap.get(mKey);
+            if (!daysMap.has(dKey)) daysMap.set(dKey, []);
+            daysMap.get(dKey).push(job);
+        });
+
+        // Sort months newest -> oldest
+        const sortedMonthKeys = Array.from(monthsMap.keys()).sort((a, b) => b.localeCompare(a));
+        let html = '';
+
+        // 1. Current month: show days directly
+        if (monthsMap.has(currentMonthKey)) {
+            const currentDaysMap = monthsMap.get(currentMonthKey);
+            const sortedDays = Array.from(currentDaysMap.keys()).sort((a, b) => b.localeCompare(a));
+            html += sortedDays
+                .map(dKey => renderDoneDayBlock(dKey, currentDaysMap.get(dKey), todayKey, yesterdayKey, isSearching))
+                .join('');
+        }
+
+        // 2. Previous months: collapsible month -> collapsible days -> cards
+        const pastMonths = sortedMonthKeys.filter(mKey => mKey !== currentMonthKey);
+        if (pastMonths.length > 0) {
+            if (monthsMap.has(currentMonthKey)) {
+                html += `<div class="done-section-divider"><span>Önceki Aylar</span></div>`;
+            }
+
+            html += pastMonths.map(mKey => {
+                const daysMap = monthsMap.get(mKey);
+                const sortedDays = Array.from(daysMap.keys()).sort((a, b) => b.localeCompare(a));
+                const monthTotal = sortedDays.reduce((sum, dk) => sum + daysMap.get(dk).length, 0);
+                const isMonthOpen = isSearching || expandedDoneMonths.has(mKey);
+                const monthLabel = formatMonthGroupLabel(mKey, currentYear);
+
+                return `
+                    <div class="done-group done-month-group ${isMonthOpen ? 'is-open' : ''}">
+                        <button type="button" class="done-group-header done-month-header" onclick="window.kanbanToggleDoneMonth('${mKey}')">
+                            <span class="done-group-left">
+                                <i data-lucide="chevron-right" class="done-chevron"></i>
+                                <i data-lucide="calendar" class="done-month-icon"></i>
+                                <span class="done-group-label">${monthLabel}</span>
+                            </span>
+                            <span class="done-group-count">${monthTotal} iş</span>
+                        </button>
+                        ${isMonthOpen ? `
+                            <div class="done-month-days">
+                                ${sortedDays.map(dKey => renderDoneDayBlock(dKey, daysMap.get(dKey), todayKey, yesterdayKey, isSearching)).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        return html;
+    }
+
     function renderColumn(col, items, isSearching) {
         const totalCount = items.length;
-        const shouldTruncate = col.key === 'done' && !isSearching && totalCount > doneLimit;
-        const visibleItems = shouldTruncate ? items.slice(0, doneLimit) : items;
-        const hiddenCount = totalCount - visibleItems.length;
         const isAddingHere = activeAddColumn === col.key;
+
+        let listContent = '';
+        if (items.length === 0) {
+            listContent = `
+                <div class="kanban-empty-state">
+                    <p>${isSearching ? 'Eşleşen iş bulunamadı' : col.emptyText}</p>
+                    ${!isSearching ? `<span>${col.emptyHint}</span>` : ''}
+                </div>
+            `;
+        } else if (col.key === 'done') {
+            listContent = renderDoneGrouped(items, isSearching);
+        } else {
+            listContent = items.map(job => renderCard(job, col.key)).join('');
+        }
 
         return `
             <div class="kanban-col col-${col.key}" data-col="${col.key}">
@@ -267,26 +397,11 @@
                 </div>
 
                 <div class="kanban-list" id="kanban-list-${col.key}" data-status="${col.key}">
-                    ${visibleItems.length > 0
-                        ? visibleItems.map(job => renderCard(job, col.key)).join('')
-                        : `
-                            <div class="kanban-empty-state">
-                                <p>${isSearching ? 'Eşleşen iş bulunamadı' : col.emptyText}</p>
-                                ${!isSearching ? `<span>${col.emptyHint}</span>` : ''}
-                            </div>
-                        `
-                    }
+                    ${listContent}
                 </div>
 
-                ${shouldTruncate ? `
-                    <button type="button" class="kanban-show-more" onclick="window.kanbanLoadMoreDone()">
-                        <i data-lucide="chevron-down"></i>
-                        <span>Daha fazla göster (+${hiddenCount})</span>
-                    </button>
-                ` : ''}
-
                 ${col.allowQuickAdd ? (
-                    isAddingHere ? `
+                isAddingHere ? `
                         <form class="kanban-inline-form" onsubmit="event.preventDefault(); window.kanbanSubmitQuickAdd('${col.key}');">
                             <input
                                 type="text"
@@ -307,7 +422,7 @@
                             <span>Bu sütuna ekle</span>
                         </button>
                     `
-                ) : ''}
+            ) : ''}
             </div>
         `;
     }
@@ -406,7 +521,7 @@
                 ghostClass: 'kanban-ghost',
                 chosenClass: 'kanban-chosen',
                 dragClass: 'kanban-drag',
-                filter: '.is-editing, .kanban-empty-state, button, input',
+                filter: '.is-editing, .kanban-empty-state, .done-group, .done-section-divider, button, input',
                 preventOnFilter: false,
                 onEnd: function (evt) {
                     const jobId = evt.item.dataset.id;
@@ -644,138 +759,145 @@
         renderBoard();
     };
 
-    window.kanbanLoadMoreDone = function () {
-        doneLimit += 50;
-        renderBoard();
-    };
+        window.kanbanToggleDoneDay = function (dayKey) {
+            if (expandedDoneDays.has(dayKey)) expandedDoneDays.delete(dayKey);
+            else expandedDoneDays.add(dayKey);
+            renderBoard();
+        };
 
-    window.kanbanOpenQuickAdd = function (colKey) {
-        editingJobId = null;
-        activeAddColumn = colKey;
-        renderBoard();
-        const input = document.getElementById(`kanban-add-input-${colKey}`);
-        if (input) input.focus();
-    };
+        window.kanbanToggleDoneMonth = function (monthKey) {
+            if (expandedDoneMonths.has(monthKey)) expandedDoneMonths.delete(monthKey);
+            else expandedDoneMonths.add(monthKey);
+            renderBoard();
+        };
 
-    window.kanbanCancelQuickAdd = function () {
-        activeAddColumn = null;
-        renderBoard();
-    };
+        window.kanbanOpenQuickAdd = function (colKey) {
+            editingJobId = null;
+            activeAddColumn = colKey;
+            renderBoard();
+            const input = document.getElementById(`kanban-add-input-${colKey}`);
+            if (input) input.focus();
+        };
 
-    window.kanbanSubmitQuickAdd = function (colKey) {
-        const input = document.getElementById(`kanban-add-input-${colKey}`);
-        if (!input) return;
-        const title = input.value.trim();
-        if (!title) {
+        window.kanbanCancelQuickAdd = function () {
             activeAddColumn = null;
             renderBoard();
-            return;
-        }
+        };
 
-        activeAddColumn = colKey;
-        optimisticAddJob(title, colKey, `kanban-add-input-${colKey}`);
-    };
+        window.kanbanSubmitQuickAdd = function (colKey) {
+            const input = document.getElementById(`kanban-add-input-${colKey}`);
+            if (!input) return;
+            const title = input.value.trim();
+            if (!title) {
+                activeAddColumn = null;
+                renderBoard();
+                return;
+            }
 
-    window.kanbanMoveJob = function (id, targetStatus) {
-        const job = allJobs.find(j => String(j.id) === String(id));
-        if (!job) return;
+            activeAddColumn = colKey;
+            optimisticAddJob(title, colKey, `kanban-add-input-${colKey}`);
+        };
 
-        const groups = getGroupedJobs();
-        const targetItems = groups[targetStatus] || [];
-        const maxPos = targetItems.reduce((max, item) => Math.max(max, item.position || 0), -1);
-        const now = new Date().toISOString();
-        const newPos = targetStatus === 'done' ? 0 : maxPos + 1;
+        window.kanbanMoveJob = function (id, targetStatus) {
+            const job = allJobs.find(j => String(j.id) === String(id));
+            if (!job) return;
 
-        // Instant optimistic update
-        job.status = targetStatus;
-        job.is_completed = targetStatus === 'done';
-        job.position = newPos;
-        job.updated_at = now;
-        if (hasStatusColumn === false) {
-            setLocalApprovalId(id, targetStatus === 'approval');
-        }
-        renderBoard();
+            const groups = getGroupedJobs();
+            const targetItems = groups[targetStatus] || [];
+            const maxPos = targetItems.reduce((max, item) => Math.max(max, item.position || 0), -1);
+            const now = new Date().toISOString();
+            const newPos = targetStatus === 'done' ? 0 : maxPos + 1;
 
-        // Sync in background
-        if (!String(id).startsWith('temp-')) {
-            updateJobInDb(id, {
-                status: targetStatus,
-                is_completed: targetStatus === 'done',
-                position: newPos,
-                updated_at: now
-            }).then(res => {
-                if (res.error) {
-                    alert('Durum güncellenemedi!');
-                    console.error(res.error);
-                    fetchJobs();
-                }
-            });
-        }
-    };
+            // Instant optimistic update
+            job.status = targetStatus;
+            job.is_completed = targetStatus === 'done';
+            job.position = newPos;
+            job.updated_at = now;
+            if (hasStatusColumn === false) {
+                setLocalApprovalId(id, targetStatus === 'approval');
+            }
+            renderBoard();
 
-    window.kanbanStartEdit = function (id) {
-        activeAddColumn = null;
-        editingJobId = id;
-        renderBoard();
-    };
+            // Sync in background
+            if (!String(id).startsWith('temp-')) {
+                updateJobInDb(id, {
+                    status: targetStatus,
+                    is_completed: targetStatus === 'done',
+                    position: newPos,
+                    updated_at: now
+                }).then(res => {
+                    if (res.error) {
+                        alert('Durum güncellenemedi!');
+                        console.error(res.error);
+                        fetchJobs();
+                    }
+                });
+            }
+        };
 
-    window.kanbanCancelEdit = function () {
-        editingJobId = null;
-        renderBoard();
-    };
+        window.kanbanStartEdit = function (id) {
+            activeAddColumn = null;
+            editingJobId = id;
+            renderBoard();
+        };
 
-    window.kanbanSaveEdit = function (id) {
-        const input = document.getElementById(`kanban-edit-input-${id}`);
-        if (!input) return;
-        const title = input.value.trim();
-        if (!title) {
+        window.kanbanCancelEdit = function () {
             editingJobId = null;
             renderBoard();
-            return;
-        }
+        };
 
-        const job = allJobs.find(j => String(j.id) === String(id));
-        const now = new Date().toISOString();
-        if (job) {
-            job.title = title;
-            job.updated_at = now;
-        }
+        window.kanbanSaveEdit = function (id) {
+            const input = document.getElementById(`kanban-edit-input-${id}`);
+            if (!input) return;
+            const title = input.value.trim();
+            if (!title) {
+                editingJobId = null;
+                renderBoard();
+                return;
+            }
 
-        editingJobId = null;
-        renderBoard();
+            const job = allJobs.find(j => String(j.id) === String(id));
+            const now = new Date().toISOString();
+            if (job) {
+                job.title = title;
+                job.updated_at = now;
+            }
 
-        if (!String(id).startsWith('temp-')) {
-            sb.from('jobs')
-                .update({ title, updated_at: now })
-                .eq('id', id)
-                .then(({ error }) => {
-                    if (error) {
-                        alert('Güncelleme hatası!');
-                        console.error(error);
-                        fetchJobs();
-                    }
-                });
-        }
-    };
+            editingJobId = null;
+            renderBoard();
 
-    window.kanbanDeleteJob = function (id) {
-        if (!confirm('Bu işi silmek istediğinize emin misiniz?')) return;
+            if (!String(id).startsWith('temp-')) {
+                sb.from('jobs')
+                    .update({ title, updated_at: now })
+                    .eq('id', id)
+                    .then(({ error }) => {
+                        if (error) {
+                            alert('Güncelleme hatası!');
+                            console.error(error);
+                            fetchJobs();
+                        }
+                    });
+            }
+        };
 
-        allJobs = allJobs.filter(j => String(j.id) !== String(id));
-        setLocalApprovalId(id, false);
-        renderBoard();
+        window.kanbanDeleteJob = function (id) {
+            if (!confirm('Bu işi silmek istediğinize emin misiniz?')) return;
 
-        if (!String(id).startsWith('temp-')) {
-            sb.from('jobs')
-                .delete()
-                .eq('id', id)
-                .then(({ error }) => {
-                    if (error) {
-                        alert('Silme hatası!');
-                        console.error(error);
-                        fetchJobs();
-                    }
-                });
-        }
-    };
-})();
+            allJobs = allJobs.filter(j => String(j.id) !== String(id));
+            setLocalApprovalId(id, false);
+            renderBoard();
+
+            if (!String(id).startsWith('temp-')) {
+                sb.from('jobs')
+                    .delete()
+                    .eq('id', id)
+                    .then(({ error }) => {
+                        if (error) {
+                            alert('Silme hatası!');
+                            console.error(error);
+                            fetchJobs();
+                        }
+                    });
+            }
+        };
+    }) ();
